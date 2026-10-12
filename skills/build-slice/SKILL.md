@@ -1,0 +1,30 @@
+---
+name: build-slice
+description: Build one vertical slice to done — tests first, a real end-to-end check, an independent review by a different model, a PR with green CI, and updated docs. Use for a ready-for-agent issue, a slice from a feature doc, or a small well-defined request.
+---
+
+# build-slice
+
+Ship one slice so it's verifiably done and the docs still tell the truth.
+
+## Done means
+
+- The acceptance criteria are covered by tests, written first.
+- The real thing works end to end: run it, and use the browser for UI. Keep only core happy-path end-to-end tests permanently.
+- An independent review passed: omp's `reviewer` agent on `reviewer_model`, given the acceptance criteria and the diff. Fix the findings, or record why not.
+- A PR is open (omp's `github` tool), with CI green. Fix failures and push until it passes.
+- The docs match reality: `docs/PRODUCT.md` and `docs/ARCHITECTURE.md` updated, ADRs written for new decisions, the slice ticked off in the feature doc.
+
+## How to work
+
+- Read `AGENTS.md` and the relevant docs first. What's written is binding; if something looks wrong, flag it rather than working around it.
+- Make technical decisions yourself and keep a decision ledger: what you decided, and what it costs if wrong. It goes in the PR description.
+- Stop and ask only for things that change acceptance criteria, or that commit to things outside the codebase (a new service or vendor, cost, data leaving the system).
+- Let risk set the rigour: higher risk gets more edge-case tests and a stricter review. Anything touching `pinned_high` is always high.
+- If CI exceeds `ci_budget`, open an issue to speed it up.
+- If `gates` includes `pr`, leave the merge to the human.
+- If an omp feature named here isn't available, use an equivalent. If there isn't one, stop and say so.
+
+## Report
+
+What shipped, the PR link, the decision ledger, anything flagged, and what the human should look at.

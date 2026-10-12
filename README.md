@@ -1,0 +1,59 @@
+# Sprengikraftur
+
+A small skill bundle for building software with strong LLM agents on [oh-my-pi (omp)](https://github.com/can1357/oh-my-pi).
+
+## Philosophy
+
+**Guide how the agent works, not how it does the work.** The skills set direction, boundaries and a definition of done, and leave the technique to the model. Less is more: every line in a skill should change behaviour. The bundle therefore assumes a strong model; weaker models need a more prescriptive process than this one.
+
+Principles that run through every skill:
+
+1. **Docs are the current truth.** A few short docs say why and what; code and tests show how. Updating the docs is part of done.
+2. **Decide, don't ask.** Ask the human only about what changes deliverables or acceptance criteria, or what commits to things outside the codebase (architecture direction, third parties, cost, data leaving the system, licenses). Ask in one batch, with suggested defaults. Decide everything else, and record it.
+3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
+4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria.
+5. **One builder, one independent reviewer.** Tests first, a real end-to-end check, and a review by a different model before the PR.
+
+## Skills
+
+| Skill | Does |
+|---|---|
+| `living-docs` | Creates or refreshes `AGENTS.md` and `docs/{BUSINESS,PRODUCT,ARCHITECTURE,DESIGN}.md` (BUSINESS and DESIGN are optional) |
+| `adr` | Records a decision in `docs/adr/NNNN-*.md` |
+| `plan-feature` | Triage, then `docs/features/NNNN-*.md` plus slices as GitHub issues |
+| `build-slice` | Builds one slice to done: tests, end-to-end check, review, PR, green CI, docs updated |
+| `drive-feature` | Runs `build-slice` across a feature's slices, then reports once |
+
+Each skill works on its own; they coordinate only through the files above.
+Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool, `omp commit`). If one is missing, the skill uses an equivalent, or stops and says so.
+
+## Config
+
+A YAML block in a `## Sprengikraftur` section of the project's `AGENTS.md` (the `living-docs` skill adds it):
+
+```yaml
+risk: medium                 # low | medium | high; a feature doc may override this, with a reason
+pinned_high: [money, auth, data-deletion, migrations]   # always high risk
+gates: []                    # spec | plan | pr: human approval before continuing
+mode: feature                # feature = build all slices | ticket = one slice at a time
+reviewer_model: "@slow"      # a different model from the builder
+ci_budget: { unit: 30s, full: 5m }
+```
+
+## Install
+
+Symlink the skills where omp discovers them:
+
+```sh
+mkdir -p ~/.agents/skills
+for s in skills/*/; do ln -s "$PWD/$s" ~/.agents/skills/; done
+```
+
+## Status
+
+Untested. Not yet checked on omp:
+1. Starting the `reviewer` agent with a chosen model and the acceptance criteria.
+2. Using the `github` tool's Actions watch for the CI fix loop.
+3. Whether goal or loop mode helps `drive-feature`.
+
+Ideas borrowed from OpenSpec, BMAD, Matt Pocock's skills, Compound Engineering, Spec Kit, Superpowers and cc-sdd.
