@@ -23,7 +23,7 @@ Choose the lightest route that's safe, and say which you chose:
 - **out of scope**
 - **risk:** inherits the project default; any override needs a reason
 - **slices:** with links to their issues
-- **assumptions and decisions** made along the way.
+- **assumptions and decisions** made along the way. Owner decisions go in PRODUCT.md or an ADR; link to them rather than repeating them.
 - **status:** `planned`, `building` or `shipped`
 
 Describe what and why. Leave the how to the builder, except where architecture or third-party choices need deciding (use the `adr` skill).

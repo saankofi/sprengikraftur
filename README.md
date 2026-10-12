@@ -51,9 +51,11 @@ for s in skills/*/; do ln -s "$PWD/$s" ~/.agents/skills/; done
 
 ## Status
 
-Untested. Not yet checked on omp:
-1. Starting the `reviewer` agent with a chosen model and the acceptance criteria.
-2. Using the `github` tool's Actions watch for the CI fix loop.
-3. Whether goal or loop mode helps `drive-feature`.
+Tested once: a receipt-scanner MVP, 4 slices, built by Opus and reviewed by GPT through omp's `reviewer` agent, with no mid-run questions. Not yet checked:
+1. Using the `github` tool's Actions watch for the CI fix loop.
+2. Whether goal or loop mode helps `drive-feature`.
+3. A second feature on an existing project, to see whether the docs stay current.
+
+Write-ups of test runs are in [`runs/`](runs/).
 
 Ideas borrowed from OpenSpec, BMAD, Matt Pocock's skills, Compound Engineering, Spec Kit, Superpowers and cc-sdd.

@@ -11,7 +11,7 @@ Give any agent arriving cold what it needs to work well, in as few words as poss
 
 - `AGENTS.md`: the entry point. How to run, test, lint and format; conventions that aren't obvious from the code; the `## Sprengikraftur` config block; links to the docs below. Keep it short.
 - `docs/BUSINESS.md`, optional: the business this lives in, who uses it and why, the domain rules that matter. Leave it out if there's no business context; its absence is information too.
-- `docs/PRODUCT.md`: what the product does **today**, its users, core flows, domain rules.
+- `docs/PRODUCT.md`: what the product does **today**, its users, core flows, domain rules. What users see, not the numbers and mechanics behind it.
 - `docs/ARCHITECTURE.md`: how it's built **today**: components, data, external services, key constraints. Every external service sits behind an interface with a fake, and there's an offline dev mode. If that isn't true yet, say so.
 - `docs/DESIGN.md`, optional: visual design (tokens, components, tone) when the product has a UI worth keeping consistent.
 
