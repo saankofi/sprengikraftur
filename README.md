@@ -49,6 +49,19 @@ mkdir -p ~/.agents/skills
 for s in skills/*/; do ln -s "$PWD/$s" ~/.agents/skills/; done
 ```
 
+To use them in one project only, link into the project's `.agents/skills/` instead (and gitignore `.agents`).
+
+## Usage
+
+In omp, in the project's directory:
+
+1. **Set up the docs.** Run `/living-docs`, adding what you know: what it's for, who uses it, the stack. It reads any existing code and asks one batch of questions. Read the docs it writes and fix anything wrong; what you write there is binding.
+2. **Plan a feature.** Describe what you want, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly. Bigger ones get a feature doc and slices as GitHub issues.
+3. **Build it.** Run `/drive-feature docs/features/NNNN-*.md` to build every slice and get one report back. To build one slice yourself, run `/build-slice <issue>`.
+4. **Read the report.** Look at the decision ledger, anything flagged, and the checks left for you.
+
+Run `/living-docs` again whenever the docs seem to have drifted. Set `gates` in the config if you want to approve the spec, plan or PRs before work continues.
+
 ## Status
 
 Tested once: a receipt-scanner MVP, 4 slices, built by Opus and reviewed by GPT through omp's `reviewer` agent, with no mid-run questions. Not yet checked:
