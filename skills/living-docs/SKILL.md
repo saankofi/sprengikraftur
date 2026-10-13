@@ -30,9 +30,7 @@ Add it if it's missing, with defaults that suit the project:
 
 ```yaml
 risk: medium                 # low | medium | high
-pinned_high: [money, auth, data-deletion, migrations]
-gates: []                    # spec | plan | pr: human approval before continuing
+approve: [pr]                # spec | plan | pr: wait for human approval at these points
 mode: feature                # feature | ticket
-reviewer_model: "@slow"      # a different model from the builder
 ci_budget: { unit: 30s, full: 5m }
 ```

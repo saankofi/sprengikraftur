@@ -12,7 +12,7 @@ Turn a request into something an agent can build and a human can check.
 Choose the lightest route that's safe, and say which you chose:
 - **direct:** small, low-risk and obvious. Just do it; no plan.
 - **ticket:** one slice. A single issue with acceptance criteria.
-- **feature:** anything bigger, or touching a `pinned_high` area, the data model, or a new external service.
+- **feature:** anything bigger, or touching money, auth, deleting data, the data model, or a new external service.
 
 ## The feature doc
 
@@ -39,4 +39,4 @@ Describe what and why. Leave the how to the builder, except where architecture o
 
 - Start from whatever exists, from a one-line idea to a full spec. What they wrote is binding; fill only the gaps.
 - Ask only what changes deliverables or acceptance criteria, or what commits to things outside the codebase. Ask in one batch, with suggested defaults. Record every other assumption in the doc.
-- If `gates` includes `spec` or `plan`, stop for approval before slices are built.
+- If `approve` includes `spec` or `plan`, stop for approval before slices are built.

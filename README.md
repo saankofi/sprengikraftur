@@ -33,12 +33,24 @@ A YAML block in a `## Sprengikraftur` section of the project's `AGENTS.md` (the 
 
 ```yaml
 risk: medium                 # low | medium | high; a feature doc may override this, with a reason
-pinned_high: [money, auth, data-deletion, migrations]   # always high risk
-gates: []                    # spec | plan | pr: human approval before continuing
+approve: [pr]                # spec | plan | pr: wait for human approval at these points
 mode: feature                # feature = build all slices | ticket = one slice at a time
-reviewer_model: "@slow"      # a different model from the builder
 ci_budget: { unit: 30s, full: 5m }
 ```
+
+With `approve: [pr]`, slices merge into a feature branch on their own, and you merge the feature into `main`. `approve: []` lets the agent merge to `main` itself.
+
+## Models
+
+The builder and the reviewer must be different models. Builders run on the session's model; `build-slice` starts the reviewer on omp's `slow` role. Set both roles in `~/.omp/agent/config.yml`:
+
+```yaml
+modelRoles:
+  default: anthropic/claude-opus-5-5     # builds
+  slow: openai-codex/gpt-6.1-sol         # reviews
+```
+
+Check with `omp config get modelRoles`. If you switch models in a session (`/model`), keep it different from `slow`. Use strong models for both.
 
 ## Install
 
@@ -60,14 +72,14 @@ In omp, in the project's directory:
 3. **Build it.** Run `/drive-feature docs/features/NNNN-*.md` to build every slice and get one report back. To build one slice yourself, run `/build-slice <issue>`.
 4. **Read the report.** Look at the decision ledger, anything flagged, and the checks left for you.
 
-Run `/living-docs` again whenever the docs seem to have drifted. Set `gates` in the config if you want to approve the spec, plan or PRs before work continues.
+Run `/living-docs` again whenever the docs seem to have drifted. Add `spec` or `plan` to `approve` if you also want to approve those before work continues.
 
 ## Status
 
-Tested once: a receipt-scanner MVP, 4 slices, built by Opus and reviewed by GPT through omp's `reviewer` agent, with no mid-run questions. Not yet checked:
+Tested on two runs: a new project (a receipt-scanner MVP) and a second feature on top of it. Not yet checked:
 1. Using the `github` tool's Actions watch for the CI fix loop.
 2. Whether goal or loop mode helps `drive-feature`.
-3. A second feature on an existing project, to see whether the docs stay current.
+3. A builder other than Opus.
 
 Write-ups of test runs are in [`runs/`](runs/).
 
