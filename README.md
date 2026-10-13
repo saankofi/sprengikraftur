@@ -42,7 +42,7 @@ With `approve: [pr]`, slices merge into a feature branch on their own, and you m
 
 ## Models
 
-The builder and the reviewer must be different models. Builders run on the session's model; `build-slice` starts the reviewer on omp's `slow` role. Set both roles in `~/.omp/agent/config.yml`:
+The builder and the reviewer must be different models. Builders run on the session's model; omp's `reviewer` agent runs on the `slow` role. Set both roles in `~/.omp/agent/config.yml`:
 
 ```yaml
 modelRoles:

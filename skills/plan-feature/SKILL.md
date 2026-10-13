@@ -9,7 +9,7 @@ Turn a request into something an agent can build and a human can check.
 
 ## Triage first
 
-Choose the lightest route that's safe, and say which you chose:
+A request may hold several unrelated changes; triage and plan each on its own. Choose the lightest route that's safe, and say which you chose:
 - **direct:** small, low-risk and obvious. Just do it; no plan.
 - **ticket:** one slice. A single issue with acceptance criteria.
 - **feature:** anything bigger, or touching money, auth, deleting data, the data model, or a new external service.
