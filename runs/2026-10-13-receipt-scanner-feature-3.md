@@ -29,3 +29,12 @@ The first run with the simplified config (`approve: [pr]`, omp's `slow` role set
 
 - **`build-slice`:** names omp's `reviewer` agent and notes that it runs on the `slow` role. There's no setting left for the builder to look for.
 - **`plan-feature`:** a request may hold several unrelated changes, and each gets triaged and planned on its own.
+
+## Afterwards: `living-docs` with no input ($4.09)
+
+- **A small, accurate PR (+28/−25 lines).** It corrected real errors, removed history from the status lines, and added a few trivia lines.
+- **It missed the ADR 0006 drift, because the skill never mentioned ADRs.** Fix: `living-docs` now checks accepted ADRs against the code.
+- **This led to the pipeline change.**
+  - `drive-feature` runs `living-docs` on the feature branch before the PR into `main`, so merging is the last step.
+  - Every stop says what to do and what happens after.
+  - `approve: [pr]` was renamed to `approve: [merge]`.

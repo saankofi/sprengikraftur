@@ -13,6 +13,7 @@ Principles that run through every skill:
 3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
 4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria.
 5. **One builder, one independent reviewer.** Tests first, a real end-to-end check, and a review by a different model before the PR.
+6. **Stop only where a human is needed.** Run every other step. At a stop, say exactly what to do and what happens after, so nothing has to be remembered.
 
 ## Skills
 
@@ -33,12 +34,12 @@ A YAML block in a `## Sprengikraftur` section of the project's `AGENTS.md` (the 
 
 ```yaml
 risk: medium                 # low | medium | high; a feature doc may override this, with a reason
-approve: [pr]                # spec | plan | pr: wait for human approval at these points
+approve: [merge]             # spec | plan | merge: wait for human approval at these points
 mode: feature                # feature = build all slices | ticket = one slice at a time
 ci_budget: { unit: 30s, full: 5m }
 ```
 
-With `approve: [pr]`, slices merge into a feature branch on their own, and you merge the feature into `main`. `approve: []` lets the agent merge to `main` itself.
+Everything else runs on its own. With `approve: [merge]`, slices merge into a feature branch, the docs are refreshed there, and you merge the feature into `main`; that's the last step. Wherever it stops, it says exactly what to do and what happens after. `approve: []` lets the agent merge to `main` itself.
 
 ## Models
 
@@ -68,15 +69,14 @@ To use them in one project only, link into the project's `.agents/skills/` inste
 In omp, in the project's directory:
 
 1. **Set up the docs.** Run `/living-docs`, adding what you know: what it's for, who uses it, the stack. It reads any existing code and asks one batch of questions. Read the docs it writes and fix anything wrong; what you write there is binding.
-2. **Plan a feature.** Describe what you want, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly. Bigger ones get a feature doc and slices as GitHub issues.
-3. **Build it.** Run `/drive-feature docs/features/NNNN-*.md` to build every slice and get one report back. To build one slice yourself, run `/build-slice <issue>`.
-4. **Read the report.** Look at the decision ledger, anything flagged, and the checks left for you.
+2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly. Bigger ones get a feature doc and slices as GitHub issues, and are then built, reviewed and documented without further input.
+3. **Do what the stop message says.** Usually that's reviewing and merging one PR into `main`, with a checklist of checks only you can do. The message says what happens after; normally nothing, because the docs are already current.
 
-Run `/living-docs` again whenever the docs seem to have drifted. Add `spec` or `plan` to `approve` if you also want to approve those before work continues.
+To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. Add `spec` or `plan` to `approve` if you also want to approve those before work continues.
 
 ## Status
 
-Tested on two runs: a new project (a receipt-scanner MVP) and a second feature on top of it. Not yet checked:
+Tested on three runs: a new project (a receipt-scanner MVP) and two features on top of it. Not yet checked:
 1. Using the `github` tool's Actions watch for the CI fix loop.
 2. Whether goal or loop mode helps `drive-feature`.
 3. A builder other than Opus.

@@ -39,4 +39,5 @@ Describe what and why. Leave the how to the builder, except where architecture o
 
 - Start from whatever exists, from a one-line idea to a full spec. What they wrote is binding; fill only the gaps.
 - Ask only what changes deliverables or acceptance criteria, or what commits to things outside the codebase. Ask in one batch, with suggested defaults. Record every other assumption in the doc.
-- If `approve` includes `spec` or `plan`, stop for approval before slices are built.
+- If `approve` includes `spec` or `plan`, stop for approval before slices are built, and say exactly what to do, what to check, and what happens after ("reply `go` and I'll …", or "nothing: merging finishes it").
+- Otherwise go straight on: `build-slice` for a ticket, `drive-feature` for a feature.
