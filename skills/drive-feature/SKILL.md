@@ -1,6 +1,6 @@
 ---
 name: drive-feature
-description: Build a planned feature end to end by running build-slice for each of its slices, then report back once. Use when a feature doc with slices exists and the human wants it built, either whole or one slice at a time.
+description: Build a planned feature end to end by running build-slice for each of its slices, then report back once. Use when a feature doc with slices exists and the human wants it built.
 ---
 
 # drive-feature
@@ -15,7 +15,7 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 - Work on a branch `feature/NNNN-short-slug` from `main`. Each slice's PR targets it and is merged once review and CI pass.
 - Build each slice with `build-slice`, in dependency order, each in its own `task` subagent. Keep your own context small: take back only each slice's report, never its diffs.
 - Build slices one after another by default. Run them in parallel (isolated worktrees) only when they change different parts of the code; if two slices touch the same screen, table, module or rule, build them in sequence.
-- If `mode: ticket`, build one slice (its PR targets `main`) and stop.
+- If `approve` includes `slice`, stop after each slice is merged into the feature branch so the human can try it: how to run it, what to try (its acceptance criteria), and the checks only a human can do. On `go`, start the next slice; if they report a problem, fix it first.
 - Stop for the human only at a step listed in `approve`, or when a question blocks the work. When you stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …", or "nothing: merging finishes it"). Otherwise keep going: park the blocked slice and carry on with the others.
 
 ## Finish

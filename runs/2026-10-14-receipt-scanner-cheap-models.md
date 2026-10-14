@@ -50,6 +50,33 @@ Kimi K2.7 Code can't drive this bundle. It ignores rules that are already writte
 - the boundary lines;
 - a pointer to the next skill: `living-docs` says what comes next is usually `plan-feature`.
 
-**Next:**
-1. Screen candidate drivers on `living-docs` alone, checking four things: does it ask questions, keep the brief's wording, stop after the docs, and keep the docs minimal?
-2. Then try a mixed setup: a capable model drives, and a cheap one builds.
+**Next:** try a newer cheap model before reaching for a mixed setup.
+
+## Attempt 3: GLM 5.3 builds, Kimi K3 reviews
+
+Same brief and skills. The human added `plan` to `approve` after `living-docs`.
+
+**Result:** shipped. Three vertical slices (an offline walking skeleton, real extraction, then the detail view, phones and a single-process build), 13 signed commits on `feature/0001-receipt-scanner-mvp`, and 42 tests passing. The stop said to merge locally and what's left to check by hand.
+
+**Cost:** about $5.60 in total, by the session logs: $0.31 for `living-docs`, $3.35 for GLM planning, driving and building, and $1.98 for Kimi reviewing. Run 1's Opus build cost $38.
+
+**Good:**
+- **Each skill stayed in its lane.** `living-docs` stopped after the docs, `plan-feature` wrote no code, `drive-feature` ran each slice as a `build-slice` subagent, and Kimi K3 reviewed each one.
+- **Acceptance tests first.** Each slice opened with failing tests; slice 1's acceptance tests were deleted once green, and two core-flow tests (scan a receipt, see the transactions) were kept.
+- **Money done right:** integer minor units per currency, parsed once at the edge, with ambiguous European formats rejected instead of misread.
+- **It respected commit signing.** Signing goes through 1Password and timed out once; it stopped and said so instead of working around it. Builders then staged their work and the driver made the commits.
+- **An honest report:** the real cost per scan ($0.027, against a planned ≲$0.001), the error paths only tested with fixtures, and the checks left for a human (real receipts, a real phone camera, images going to OpenRouter).
+
+**Not good:**
+- **It asked nothing, again.** The plan decided HKD only with no currency column, and no line items, tax, payment method or raw output. It listed these openly as assumptions, so the plan stop caught them and one reply fixed them. Without `plan` in `approve`, a US-dollar receipt would have been saved as Hong Kong dollars.
+- **`living-docs` wasn't run at the finish.** The driver checked the docs against the code itself instead.
+- **The kept "end-to-end" tests are at the HTTP level.** There are no frontend tests; the browser was only checked by hand during each slice.
+- **Interruptions:** provider stalls, and the OpenRouter credit ran out mid-slice once. Each time it resumed cleanly when told to carry on.
+
+**Conclusion:** GLM 5.3 can drive the bundle, but not alone: it doesn't ask product questions. With cheap models, use `approve: [plan, merge]` so a human checks the plan's assumptions.
+
+## Changes made afterwards
+
+- **`approve: [slice]` replaces `mode`.** It stops after each slice on the feature branch so the human can try it; `mode: ticket` (a PR into `main` per slice) is gone.
+- **The README** documents each `approve` value and recommends `[plan, merge]` with models that don't ask.
+- **Install** is now a clone plus `skills.customDirectories`, with no symlinks.

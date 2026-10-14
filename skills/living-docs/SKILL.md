@@ -33,7 +33,6 @@ Add it if it's missing, with defaults that suit the project:
 
 ```yaml
 risk: medium                 # low | medium | high
-approve: [merge]             # spec | plan | merge: wait for human approval at these points
-mode: feature                # feature | ticket
+approve: [merge]             # spec | plan | slice | merge: wait for the human at these points
 ci_budget: { unit: 30s, full: 5m }
 ```

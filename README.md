@@ -34,12 +34,27 @@ A YAML block in a `## Sprengikraftur` section of the project's `AGENTS.md` (the 
 
 ```yaml
 risk: medium                 # low | medium | high; a feature doc may override this, with a reason
-approve: [merge]             # spec | plan | merge: wait for human approval at these points
-mode: feature                # feature = build all slices | ticket = one slice at a time
+approve: [merge]             # spec | plan | slice | merge: wait for the human at these points
 ci_budget: { unit: 30s, full: 5m }
 ```
 
-Everything else runs on its own. With `approve: [merge]`, slices merge into a feature branch, the docs are refreshed there, and you merge the feature into `main`; that's the last step. Wherever it stops, it says exactly what to do and what happens after. `approve: []` lets the agent merge to `main` itself.
+### `approve`
+
+Everything runs on its own except the steps listed in `approve`. At each one the agent stops and says what to check, what to reply, and what happens next.
+
+| Value | Stops | You | Then |
+|---|---|---|---|
+| `spec` | After the feature doc's deliverables and acceptance criteria, before slicing | Check *what* gets built. Reply `go` or say what to change | It plans the slices |
+| `plan` | After the slices are planned, before building | Check what gets built and how it's cut. Reply `go` or say what to change | It builds every slice |
+| `slice` | After each slice is built, reviewed and merged into the feature branch | Try it: the stop says how to run it and what to check. Reply `go` or report a problem | It fixes the problem, or starts the next slice |
+| `merge` | After every slice is done and the docs are refreshed on the feature branch | Review the one PR (or branch) into `main` and its checklist of human-only checks, then merge | Nothing: merging finishes the feature |
+
+- **`[merge]` (default):** you only see the finished feature.
+- **`[plan, merge]`:** also catches wrong guesses about the product before any code is written. Use it with models that don't ask questions (see [run 4](runs/2026-10-14-receipt-scanner-cheap-models.md)).
+- **`[slice, merge]`:** test as you go; use it when you want to see each step working on a real device or real data.
+- **`[]`:** fully hands-off; the agent merges into `main` itself once CI passes.
+
+Small changes skip the feature machinery: a one-line fix is just done, and a single-slice ticket gets its own PR into `main`, which waits for you if `merge` is set.
 
 ## Models
 
@@ -55,14 +70,12 @@ Check with `omp config get modelRoles`. If you switch models in a session (`/mod
 
 ## Install
 
-Symlink the skills where omp discovers them:
-
 ```sh
-mkdir -p ~/.agents/skills
-for s in skills/*/; do ln -s "$PWD/$s" ~/.agents/skills/; done
+git clone https://github.com/saankofi/sprengikraftur ~/.sprengikraftur
+omp config set skills.customDirectories '["~/.sprengikraftur/skills"]'
 ```
 
-To use them in one project only, link into the project's `.agents/skills/` instead (and gitignore `.agents`).
+Check with `omp read skill://plan-feature`. To update, `git -C ~/.sprengikraftur pull`. (If you already use `skills.customDirectories`, add the path to the list rather than replacing it.)
 
 ## Usage
 
@@ -72,14 +85,14 @@ In omp, in the project's directory:
 2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly. Bigger ones get a feature doc and slices as GitHub issues, and are then built, reviewed and documented without further input.
 3. **Do what the stop message says.** Usually that's reviewing and merging one PR into `main`, with a checklist of checks only you can do. The message says what happens after; normally nothing, because the docs are already current.
 
-To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. Add `spec` or `plan` to `approve` if you also want to approve those before work continues.
+To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. Change `approve` to choose where it stops for you (see [`approve`](#approve)).
 
 ## Status
 
-Tested on three runs: a new project (a receipt-scanner MVP) and two features on top of it. Not yet checked:
+Tested on four runs: a new project (a receipt-scanner MVP) and two features on top of it with Opus and GPT, then the MVP again with cheap models. GLM 5.3 building with Kimi K3 reviewing shipped it for about $6; Kimi K2.7 couldn't drive it. Not yet checked:
 1. Using the `github` tool's Actions watch for the CI fix loop.
 2. Whether goal or loop mode helps `drive-feature`.
-3. A builder other than Opus.
+3. `approve: [slice]`.
 
 Write-ups of test runs are in [`runs/`](runs/).
 
