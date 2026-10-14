@@ -38,6 +38,16 @@ approve: [merge]             # spec | plan | slice | merge: wait for the human a
 ci_budget: { unit: 30s, full: 5m }
 ```
 
+### `risk`
+
+How costly a mistake would be. It sets the rigour (edge-case tests, how strict the review is) and how readily the agent asks about business rules:
+
+- **`low`:** asks only when it can't go on without an answer.
+- **`medium`:** asks where a wrong guess would record wrong data or be hard to undo, for example how currencies are handled.
+- **`high`:** asks about any business rule that isn't written down.
+
+Technical choices are never asked; architecture and outside commitments always come to you as proposed ADRs. A feature doc can raise or lower risk for that feature, with a reason.
+
 ### `approve`
 
 Everything runs on its own except the steps listed in `approve`. At each one the agent stops and says what to check, what to reply, and what happens next.

@@ -42,7 +42,7 @@ Describe what and why. Leave the how to the builder, except where architecture o
 ## Working with the human
 
 - Start from whatever exists, from a one-line idea to a full spec. What they wrote is binding; fill only the gaps.
-- Ask about business rules the docs don't settle: what gets recorded, money, who can do what, what users see. Never guess these silently; a wrong guess builds the wrong thing or records wrong data.
+- Ask about business rules the docs don't settle (what gets recorded, money, who can do what, what users see), as far as `risk` says. `low`: only when you can't go on without an answer. `medium`: where a wrong guess records wrong data or is hard to undo. `high`: any rule that isn't written down. Never guess silently: whatever you don't ask goes in the doc as an assumption.
 - Decide technical questions yourself and record them in the doc. Architecture, and anything that commits outside the codebase (a new service, cost, data leaving the system), goes in a `proposed` ADR for the human to accept.
 - Ask in one batch, each question with your default; replying `go` accepts them all. If `approve` includes `spec` or `plan`, put the questions in that stop instead of stopping twice.
 - If `approve` includes `spec`, stop once the deliverables and acceptance criteria are written, before slicing. If it includes `plan`, stop once the slices are planned, before building. At a stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …").
