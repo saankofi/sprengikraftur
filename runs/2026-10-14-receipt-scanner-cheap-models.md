@@ -79,4 +79,5 @@ Same brief and skills. The human added `plan` to `approve` after `living-docs`.
 
 - **`approve: [slice]` replaces `mode`.** It stops after each slice on the feature branch so the human can try it; `mode: ticket` (a PR into `main` per slice) is gone.
 - **The README** documents each `approve` value and recommends `[plan, merge]` with models that don't ask.
-- **Install** is now a clone plus `skills.customDirectories`, with no symlinks.
+- **Install** is `npx skills add saankofi/sprengikraftur -g -a universal`.
+- **Merging:** the human approves with `go`; the agent checks CI and merges.

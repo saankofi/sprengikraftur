@@ -26,7 +26,7 @@ Build only this slice. Anything else you notice goes in the report.
 - Let risk set the rigour: higher risk gets more edge-case tests and a stricter review. Rigour scales with the cost of being wrong, not with what's possible.
 - Build for what exists. Don't build compatibility for data, users or releases that don't exist yet.
 - If CI exceeds `ci_budget`, open an issue to speed it up.
-- Merge into a feature branch yourself. A PR into `main` waits for the human if `approve` includes `merge`; say exactly what to do, what to check, and what happens after ("reply `go` and I'll …", or "nothing: merging finishes it").
+- Merge into a feature branch yourself. A PR into `main` waits for the human's approval if `approve` includes `merge`; once they approve, check CI is green, merge it yourself, and clean up the branch. At the stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …").
 - Don't work around security controls (commit signing, auth, hooks). Stop and say so.
 - If an omp feature named here isn't available, use an equivalent. If there isn't one, stop and say so.
 

@@ -16,12 +16,12 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 - Build each slice with `build-slice`, in dependency order, each in its own `task` subagent. Keep your own context small: take back only each slice's report, never its diffs.
 - Build slices one after another by default. Run them in parallel (isolated worktrees) only when they change different parts of the code; if two slices touch the same screen, table, module or rule, build them in sequence.
 - If `approve` includes `slice`, stop after each slice is merged into the feature branch so the human can try it: how to run it, what to try (its acceptance criteria), and the checks only a human can do. On `go`, start the next slice; if they report a problem, fix it first.
-- Stop for the human only at a step listed in `approve`, or when a question blocks the work. When you stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …", or "nothing: merging finishes it"). Otherwise keep going: park the blocked slice and carry on with the others.
+- Stop for the human only at a step listed in `approve`, or when a question blocks the work. When you stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …"). Otherwise keep going: park the blocked slice and carry on with the others.
 
 ## Finish
 
 - Check that the docs describe what actually shipped: PRODUCT, ARCHITECTURE, ADRs, the feature doc. Fix any drift you find in them, including drift from before this feature. Check new ADRs against older ones; supersede any they contradict. Where docs conflict on a product rule, say which rule the code follows today, and flag it. Then run `living-docs` on the feature branch. Set the status to `shipped`.
-- Open one PR from the feature branch into `main`, with the report as its description and the checks only a human can do (real devices, real files) as a checklist. If `approve` includes `merge`, leave the merge to the human; otherwise merge it once CI passes.
+- Open one PR from the feature branch into `main`, with the report as its description and the checks only a human can do (real devices, real files) as a checklist. If `approve` includes `merge`, stop for the human's approval; once they approve, check CI is green, merge it yourself, and clean up the branches. Otherwise merge it once CI passes.
 - Hand back one report:
   - what shipped, with links
   - the combined decision ledger
