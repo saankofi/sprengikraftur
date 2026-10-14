@@ -30,7 +30,7 @@ Only write docs: don't plan or build. When you're done, say what comes next (usu
 
 ## Config block (in AGENTS.md)
 
-Add it if it's missing, with defaults that suit the project:
+Add it if it's missing, with these defaults. Changing `risk` or `approve` is the human's call: suggest it, don't set it.
 
 ```yaml
 risk: medium                 # low | medium | high

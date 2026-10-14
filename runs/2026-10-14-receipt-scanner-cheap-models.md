@@ -102,3 +102,23 @@ The same brief and models as run 4, attempt 3, after the question changes: ask a
 ## Changes made afterwards
 
 - **`living-docs`:** facts about outside services (model IDs, API versions, prices) are checked against the service itself, not memory or search results.
+
+## Attempt 2: Kimi K3, `living-docs` only
+
+The same brief, with the fact-check line. Stopped after `living-docs`.
+
+**Good:**
+- **It checked the model ID against OpenRouter's live model list** and wrote the right one (`qwen/qwen3.8-flash`) as a setting. The new line worked.
+- **It handled the key carefully:** it read only the key names from `.env` and used the key without printing it.
+- **Two questions, both about business:** which accounting system, and whether staff log in. Nothing technical. The docs were minimal (484 words).
+
+**Not good:**
+- **"Amounts are HKD only; no multi-currency in the MVP"** was written as a business rule without asking, the same as GLM.
+- **It set `risk: low` itself.** Since risk now decides how readily it asks, that lowered the bar for its own questions.
+- **It recommended Xero** for a question whose honest answer was "undecided".
+
+## Changes made afterwards
+
+- **`living-docs`:** writes the default config; changing `risk` or `approve` is the human's call.
+
+**Next:** run Opus on the same brief, as a baseline. No model has raised currency unprompted on this brief yet, and run 1 never tested it: Opus was given the answers.
