@@ -7,6 +7,8 @@ description: Build a planned feature end to end by running build-slice for each 
 
 Get a whole feature built while the human is away, then hand back one clear report.
 
+Don't build slices yourself: each one runs as `build-slice` in its own subagent.
+
 ## How to work
 
 - Read the feature doc and `AGENTS.md`. Set the feature's status to `building`.

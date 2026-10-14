@@ -7,6 +7,8 @@ description: Create or refresh a project's living docs — AGENTS.md plus docs/B
 
 Give any agent arriving cold what it needs to work well, in as few words as possible.
 
+Only write docs: don't plan or build. When you're done, say what comes next.
+
 ## The docs
 
 - `AGENTS.md`: the entry point. How to run, test, lint and format; conventions that aren't obvious from the code; the `## Sprengikraftur` config block; links to the docs below. Keep it short.

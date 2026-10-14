@@ -7,6 +7,8 @@ description: Turn a request, idea or spec into a planned feature — triage it, 
 
 Turn a request into something an agent can build and a human can check.
 
+Only plan: don't write code. Building happens in `build-slice` or `drive-feature`.
+
 ## Triage first
 
 A request may hold several unrelated changes; triage and plan each on its own. Choose the lightest route that's safe, and say which you chose:

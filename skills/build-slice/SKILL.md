@@ -7,6 +7,8 @@ description: Build one vertical slice to done — tests first, a real end-to-end
 
 Ship one slice so it's verifiably done and the docs still tell the truth.
 
+Build only this slice. Anything else you notice goes in the report.
+
 ## Done means
 
 - Acceptance tests came first: one per acceptance criterion, at the outermost level that shows it (the browser for a UI flow, the API for a backend rule), seen failing. The inside was then test-driven until they passed.
