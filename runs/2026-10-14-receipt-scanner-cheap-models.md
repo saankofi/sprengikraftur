@@ -32,3 +32,24 @@ It was stopped mid-build. The work is kept on the `attempt-1-kimi` branch of the
 ## Attempt 2
 
 Same setup, with the boundary lines.
+
+- **The boundary held.** It stopped after the docs.
+- **It still asked nothing.** It invented a review-before-save step, an admin role, a retry flow and "currency fixed to HKD", all decisions that change what gets built.
+- **It broke rules that are already written:**
+  - It replaced the brief's "qwen flash" with `qwen/qwen-vl-plus`.
+  - Its docs were about what's missing ("scaffold not yet in place", "to add later").
+- **"What comes next" was a horizontal build list,** not `plan-feature`.
+
+Stopped there.
+
+## Conclusion
+
+Kimi K2.7 Code can't drive this bundle. It ignores rules that are already written down, so more lines wouldn't help; making it work would take step-by-step instructions, which goes against the bundle's philosophy.
+
+**Kept:**
+- the boundary lines;
+- a pointer to the next skill: `living-docs` says what comes next is usually `plan-feature`.
+
+**Next:**
+1. Screen candidate drivers on `living-docs` alone, checking four things: does it ask questions, keep the brief's wording, stop after the docs, and keep the docs minimal?
+2. Then try a mixed setup: a capable model drives, and a cheap one builds.
