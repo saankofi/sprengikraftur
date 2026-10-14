@@ -21,7 +21,7 @@ Only write docs: don't plan or build. When you're done, say what comes next (usu
 
 - Docs describe current truth. Plans and history belong elsewhere (features, ADRs, git).
 - Derive from the code and existing docs first. Where they disagree, believe the code and flag the gap.
-- Ask the human only what you can't find out or reasonably default: business context, intent, architecture direction, third parties. Ask in one batch, each question with a suggested default.
+- Ask the human only what you can't find out: business context and rules, intent, architecture direction, third parties. Decide technical details yourself. Ask in one batch, each question with a suggested default.
 - Anything the human wrote or approved is binding. Refine the wording; don't change the meaning.
 - Check accepted ADRs against the code too. If one no longer holds, supersede it with a new ADR, or flag it.
 - Prefer short and accurate over complete. A doc nobody keeps up to date is worse than no doc.

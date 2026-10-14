@@ -22,7 +22,7 @@ Build only this slice. Anything else you notice goes in the report.
 
 - Read `AGENTS.md` and the relevant docs first. What's written is binding; if something looks wrong, flag it rather than working around it.
 - Make technical decisions yourself and keep a decision ledger: what you decided, and what it costs if wrong. It goes in the PR description.
-- Stop and ask only for things that change acceptance criteria, or that commit to things outside the codebase (a new service or vendor, cost, data leaving the system).
+- Stop and ask only about a business rule the docs and acceptance criteria don't settle, or something that commits outside the codebase (a new service or vendor, cost, data leaving the system). Technical questions are yours.
 - Let risk set the rigour: higher risk gets more edge-case tests and a stricter review. Rigour scales with the cost of being wrong, not with what's possible.
 - Build for what exists. Don't build compatibility for data, users or releases that don't exist yet.
 - If CI exceeds `ci_budget`, open an issue to speed it up.

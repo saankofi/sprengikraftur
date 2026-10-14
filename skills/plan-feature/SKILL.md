@@ -42,7 +42,8 @@ Describe what and why. Leave the how to the builder, except where architecture o
 ## Working with the human
 
 - Start from whatever exists, from a one-line idea to a full spec. What they wrote is binding; fill only the gaps.
-- Ask only what changes deliverables or acceptance criteria, or what commits to things outside the codebase. Ask in one batch, with suggested defaults. Record every other assumption in the doc.
-- An assumption that changes what gets built or recorded, where a wrong guess means wrong data or rework, is a question, not a decision: ask it, with your default. Ask nothing else. Replying `go` accepts every default. If `approve` includes `spec` or `plan`, put the questions in that stop instead of stopping twice.
+- Ask about business rules the docs don't settle: what gets recorded, money, who can do what, what users see. Never guess these silently; a wrong guess builds the wrong thing or records wrong data.
+- Decide technical questions yourself and record them in the doc. Architecture, and anything that commits outside the codebase (a new service, cost, data leaving the system), goes in a `proposed` ADR for the human to accept.
+- Ask in one batch, each question with your default; replying `go` accepts them all. If `approve` includes `spec` or `plan`, put the questions in that stop instead of stopping twice.
 - If `approve` includes `spec`, stop once the deliverables and acceptance criteria are written, before slicing. If it includes `plan`, stop once the slices are planned, before building. At a stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …").
 - Otherwise go straight on: `build-slice` for a ticket, `drive-feature` for a feature.

@@ -9,7 +9,7 @@ A small skill bundle for building software with strong LLM agents on [oh-my-pi (
 Principles that run through every skill:
 
 1. **Docs are the current truth.** A few short docs say why and what; code and tests show how. Updating the docs is part of done.
-2. **Decide, don't ask.** Ask the human only about what changes deliverables or acceptance criteria, or what commits to things outside the codebase (architecture direction, third parties, cost, data leaving the system, licenses). Ask in one batch, with suggested defaults. Decide everything else, and record it.
+2. **Ask about the business, decide the technical.** Business rules (what gets recorded, money, who can do what, what users see) are never guessed silently. Technical choices are the agent's, recorded as it goes. Architecture and commitments outside the codebase (third parties, cost, data leaving the system, licenses) are proposed as ADRs for the human to accept. Questions come in one batch, each with a default, so `go` answers them all.
 3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
 4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria.
 5. **One builder, one independent reviewer.** Acceptance tests first, a real end-to-end check, and a review by a different model before the PR.
