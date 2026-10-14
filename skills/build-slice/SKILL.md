@@ -9,10 +9,11 @@ Ship one slice so it's verifiably done and the docs still tell the truth.
 
 ## Done means
 
-- The acceptance criteria are covered by tests, written first.
-- The real thing works end to end: run it, and use the browser for UI. Keep only core happy-path end-to-end tests permanently.
+- Acceptance tests came first: one per acceptance criterion, at the outermost level that shows it (the browser for a UI flow, the API for a backend rule), seen failing. The inside was then test-driven until they passed.
+- The real thing works end to end: run it, and use the browser for UI.
+- The slice's acceptance tests are deleted once they pass; git keeps them. The permanent end-to-end suite has one test per core flow in `docs/PRODUCT.md`. If this slice adds or changes a core flow, update that flow and its test, and flag it.
 - An independent review passed: omp's `reviewer` agent (it runs on omp's `slow` role, a different model from the builder), given the acceptance criteria and the diff. Fix the findings, or record why not.
-- A PR is open (omp's `github` tool), with CI green. Fix failures and push until it passes. It targets the feature branch when there is one, otherwise `main`.
+- A PR is open (omp's `github` tool), with CI green. Fix failures and push until it passes. It targets the feature branch when there is one, otherwise `main`. With no GitHub remote, use local branches and run the checks in `AGENTS.md` in place of CI.
 - The docs match reality, and stay short: `docs/PRODUCT.md` (what users see, not the numbers behind it) and `docs/ARCHITECTURE.md` updated, ADRs written for decisions that are hard to reverse, superseding any they contradict, and the slice ticked off in the feature doc.
 
 ## How to work

@@ -14,6 +14,8 @@ A request may hold several unrelated changes; triage and plan each on its own. C
 - **ticket:** one slice. A single issue with acceptance criteria.
 - **feature:** anything bigger, or touching money, auth, deleting data, the data model, or a new external service.
 
+Then ask: **does this change the architecture?** A new component, storage, service or deployment shape, or a change across the codebase (auth, background jobs). If so, decide it before slicing: ADRs (use the `adr` skill) and `docs/ARCHITECTURE.md`, then make the first slice a thin path through the new structure, end to end. Usually the answer is no, in one line.
+
 ## The feature doc
 
 `docs/features/NNNN-short-slug.md`. Cover:

@@ -12,7 +12,7 @@ Principles that run through every skill:
 2. **Decide, don't ask.** Ask the human only about what changes deliverables or acceptance criteria, or what commits to things outside the codebase (architecture direction, third parties, cost, data leaving the system, licenses). Ask in one batch, with suggested defaults. Decide everything else, and record it.
 3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
 4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria.
-5. **One builder, one independent reviewer.** Tests first, a real end-to-end check, and a review by a different model before the PR.
+5. **One builder, one independent reviewer.** Acceptance tests first, a real end-to-end check, and a review by a different model before the PR.
 6. **Stop only where a human is needed.** Run every other step. At a stop, say exactly what to do and what happens after, so nothing has to be remembered.
 
 ## Skills
