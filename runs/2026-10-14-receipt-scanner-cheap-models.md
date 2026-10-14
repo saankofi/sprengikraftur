@@ -81,3 +81,24 @@ Same brief and skills. The human added `plan` to `approve` after `living-docs`.
 - **The README** documents each `approve` value and recommends `[plan, merge]` with models that don't ask.
 - **Install** is `npx skills add saankofi/sprengikraftur -g -a universal`.
 - **Merging:** the human approves with `go`; the agent checks CI and merges.
+
+# Run 5: GLM 5.3 again, with business questions (2026-10-14)
+
+The same brief and models as run 4, attempt 3, after the question changes: ask about business rules (as far as `risk` says), decide technical ones, and put the questions inside the plan stop. Stopped at the plan stop. Cost: $0.12.
+
+**Better:**
+- **`living-docs` asked three questions in one batch, each with a default, all about business rules:** which fields to record, which accounting system, and whether to record who submitted. Run 4 asked none. Removing "or reasonably default", the phrase it had quoted to itself, made the difference.
+- **`plan-feature` asked two, both about money:** confirm before saving, and delete. They came inside the plan stop, so there was no second stop.
+- **No technical questions.** Technical choices were listed separately as the planner's decisions, and the builder was told the endpoint shapes "are defaults, not straitjackets".
+
+**Still wrong:**
+- **Currency only came up because the human asked.** The recommended field set left it out, at `medium` risk where it is the clearest case of wrong data.
+- **An invented model ID.** It wrote `qwen/qwen3-vl-flash` into the docs, with a made-up retirement date for an older snapshot. OpenRouter has no such model; it searched the web and never checked OpenRouter.
+- **A contradiction between docs went unnoticed.** BUSINESS.md says currency is "never assumed to be HKD", PRODUCT.md says "default HKD when unreadable", and the plan inherited the second.
+- **A wasted question:** it asked whether to reopen "no delete", which PRODUCT.md had already settled.
+
+**Conclusion:** the question changes work, even on a cheap model. What GLM lacks is judgement: checking facts, seeing contradictions, picking safe defaults. It plans and builds well enough once the docs and plan are right. Next: screen Kimi K3 on `living-docs` and `plan-feature` alone; if it fails too, use a frontier model for docs and planning and a cheap one to build.
+
+## Changes made afterwards
+
+- **`living-docs`:** facts about outside services (model IDs, API versions, prices) are checked against the service itself, not memory or search results.

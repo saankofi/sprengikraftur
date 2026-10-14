@@ -24,6 +24,7 @@ Only write docs: don't plan or build. When you're done, say what comes next (usu
 - Ask the human only what you can't find out: business context and rules, intent, architecture direction, third parties. Decide technical details yourself. Ask in one batch, each question with a suggested default.
 - Anything the human wrote or approved is binding. Refine the wording; don't change the meaning.
 - Check accepted ADRs against the code too. If one no longer holds, supersede it with a new ADR, or flag it.
+- Check facts about outside services (model IDs, API versions, prices) against the service itself, not memory or search results.
 - Prefer short and accurate over complete. A doc nobody keeps up to date is worse than no doc.
 - On a new project, keep the docs minimal: say what exists and what was asked for, not what's missing.
 
