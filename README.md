@@ -131,3 +131,7 @@ Tested on six runs: a receipt-scanner MVP and two features on top of it with Opu
 Write-ups of test runs are in [`runs/`](runs/).
 
 Ideas borrowed from OpenSpec, BMAD, Matt Pocock's skills, Compound Engineering, Spec Kit, Superpowers and cc-sdd.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
