@@ -70,15 +70,38 @@ Small changes skip the feature machinery: a one-line fix is just done, and a sin
 
 ## Models
 
-The builder and the reviewer must be different models. Builders run on the session's model; omp's `reviewer` agent runs on the `slow` role. Set both roles in `~/.omp/agent/config.yml`:
+There are three jobs, and they need different things:
+
+- **Planning** (`living-docs`, `plan-feature`): judgement about the business, such as which questions to ask, safe defaults, and checking facts. It uses few tokens, so use the strongest model you have.
+- **Building** (`build-slice`): good technical judgement. It uses most of the tokens, so this is where a cheaper model pays off.
+- **Reviewing** (omp's `reviewer` agent): an independent check. Always a different model from the builder, ideally from a different company. It's cheap.
+
+Builders run on the session's model; the reviewer runs on omp's `slow` role. Set the roles in `~/.omp/agent/config.yml` (check with `omp config get modelRoles`):
 
 ```yaml
 modelRoles:
-  default: anthropic/claude-opus-5-5     # builds
+  default: anthropic/claude-opus-5-5     # plans (and builds, unless you switch)
   slow: openai-codex/gpt-6.1-sol         # reviews
 ```
 
-Check with `omp config get modelRoles`. If you switch models in a session (`/model`), keep it different from `slow`. Use strong models for both.
+To build on a cheaper model, add `plan` to `approve`. At the plan stop, switch with `/model z-ai/glm-5.3`, then reply `go`. Keep the builder different from `slow`.
+
+Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested; prices per million tokens in/out on OpenRouter, October 2026):
+
+| Model | In / out | Plan | Build | Review |
+|---|---|---|---|---|
+| `anthropic/claude-fable-5.1` | $10 / $50 | ? | – | – |
+| `anthropic/claude-opus-5.5` | $4 / $20 | ✓ | ✓ | ? |
+| `anthropic/claude-sonnet-5.5` | $2 / $10 | ? | ? | ? |
+| `openai/gpt-6-astra` | $10 / $50 | ? | – | – |
+| `openai/gpt-6.1-sol` | $2 / $10 | ? | ? | ✓ |
+| `z-ai/glm-5.3` | $0.08 / $4.80 | ✗ | ✓ | ? |
+| `moonshotai/kimi-k3` | $0.50 / $15 | ✗ | ? | ✓ |
+| `deepseek/deepseek-v4-pro` | $0.66 / $1.98 | ? | ? | ? |
+| `qwen/qwen3.8-max` | $2 / $6 | ? | ? | ? |
+| `moonshotai/kimi-k2.7-code` | $0.67 / $3.35 | ✗ | ✗ | – |
+
+Proven so far: **Opus plans, GLM 5.3 builds, GPT-6.1 Sol or Kimi K3 reviews**, for about $6 for a small MVP. Cheap models plan badly: they fill business gaps with silent defaults and state unchecked facts. The smallest tiers (Haiku, GPT Luna, the Flash models) are untested and probably too small to build.
 
 ## Install
 
@@ -100,7 +123,7 @@ To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/bu
 
 ## Status
 
-Tested on four runs: a new project (a receipt-scanner MVP) and two features on top of it with Opus and GPT, then the MVP again with cheap models. GLM 5.3 building with Kimi K3 reviewing shipped it for about $6; Kimi K2.7 couldn't drive it. Not yet checked:
+Tested on six runs: a receipt-scanner MVP and two features on top of it with Opus and GPT, then the MVP again with cheap models and finally with Opus planning and GLM building. Not yet checked:
 1. Using the `github` tool's Actions watch for the CI fix loop.
 2. Whether goal or loop mode helps `drive-feature`.
 3. `approve: [slice]`.
