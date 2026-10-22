@@ -113,13 +113,19 @@ This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to instal
 
 ## Usage
 
-In omp, in the project's directory:
+### Setup (once per project)
 
-1. **Set up the docs.** Run `/living-docs`, adding what you know: what it's for, who uses it, the stack. It reads any existing code and asks one batch of questions. Read the docs it writes and fix anything wrong; what you write there is binding.
-2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly. Bigger ones get a feature doc and slices as GitHub issues, and are then built, reviewed and documented without further input.
-3. **Do what the stop message says.** Usually that's reviewing one PR into `main`, with a checklist of checks only you can do, then replying `go`. The agent merges it; the docs are already current, so that finishes the feature.
+1. **Install** the skills and **set the model roles** (above).
+2. In omp, in the project's directory, run `/living-docs`, adding what you know: what it's for, who uses it, the stack. It reads any existing code and asks one batch of questions.
+3. **Read the docs it writes** and fix anything wrong; what you write there is binding. Set `risk` and `approve` in `AGENTS.md` if the defaults don't fit.
 
-To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. Change `approve` to choose where it stops for you (see [`approve`](#approve)).
+### Daily use
+
+1. **Start a new session for each request.** The docs carry the context, so a fresh session loses nothing, and it's cheaper and sharper than one that has run for days.
+2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc and slices as GitHub issues.
+3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. If you're building on a cheaper model, switch with `/model` at the plan stop.
+
+To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
 
 ## Status
 
