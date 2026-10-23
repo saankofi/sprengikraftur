@@ -76,15 +76,16 @@ There are three jobs, and they need different things:
 - **Building** (`build-slice`): good technical judgement. It uses most of the tokens, so this is where a cheaper model pays off.
 - **Reviewing** (omp's `reviewer` agent): an independent check. Always a different model from the builder, ideally from a different company. It's cheap.
 
-Builders run on the session's model; the reviewer runs on omp's `slow` role. Set the roles in `~/.omp/agent/config.yml` (check with `omp config get modelRoles`):
+Each job runs on an omp model role: the session (planning and driving) on `default`, builders (omp's `task` agent) on `task`, and the reviewer on `slow`. Set them in `~/.omp/agent/config.yml` (check with `omp config get modelRoles`):
 
 ```yaml
 modelRoles:
-  default: anthropic/claude-opus-5-5     # plans (and builds, unless you switch)
+  default: anthropic/claude-opus-5.5     # plans and drives
+  task: anthropic/claude-sonnet-5.5      # builds
   slow: openai-codex/gpt-6.1-sol         # reviews
 ```
 
-To build on a cheaper model, add `plan` to `approve`. At the plan stop, switch with `/model z-ai/glm-5.3`, then reply `go`. Keep the builder different from `slow`.
+Without `task`, builders run on `default`. Keep `task` and `slow` different. On a subscription, choose by quota rather than price: a cheaper builder still saves most of it, because building uses most of the tokens.
 
 Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested; prices per million tokens in/out on OpenRouter, October 2026):
 
@@ -101,7 +102,7 @@ Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested; prices pe
 | `qwen/qwen3.8-max` | $2 / $6 | ? | ? | ? |
 | `moonshotai/kimi-k2.7-code` | $0.67 / $3.35 | ✗ | ✗ | – |
 
-Proven so far: **Opus plans, GLM 5.3 builds, GPT-6.1 Sol or Kimi K3 reviews**, for about $6 for a small MVP. Cheap models plan badly: they fill business gaps with silent defaults and state unchecked facts. The smallest tiers (Haiku, GPT Luna, the Flash models) are untested and probably too small to build.
+Proven so far: **Opus plans, GLM 5.3 builds, GPT-6.1 Sol or Kimi K3 reviews**, for about $6 for a small MVP. On a real 5-day project with Opus building, building was 70% of the cost. Cheap models plan badly: they fill business gaps with silent defaults and state unchecked facts. The smallest tiers (Haiku, GPT Luna, the Flash models) are untested and probably too small to build.
 
 ## Install
 
@@ -123,7 +124,7 @@ This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to instal
 
 1. **Start a new session for each request.** The docs carry the context, so a fresh session loses nothing, and it's cheaper and sharper than one that has run for days.
 2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc and slices as GitHub issues.
-3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. If you're building on a cheaper model, switch with `/model` at the plan stop.
+3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
 
 To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
 

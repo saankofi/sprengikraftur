@@ -23,3 +23,5 @@ The first use outside the test runs: a static site in Python, built from about 1
 ## Changes made afterwards
 
 - **README Usage** is split into Setup (once per project) and Daily use, starting with "start a new session for each request".
+- **Builders get their own model role.** omp's `task` agent runs on `modelRoles.task`, checked with a one-subagent run: the session stayed on Opus and the subagent ran on Sonnet. That replaces switching with `/model` at the plan stop.
+- **`drive-feature`:** once nothing is left, the final stop says to start a new session for the next request.

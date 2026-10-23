@@ -28,4 +28,4 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
   - the combined decision ledger
   - anything flagged or parked
   - what needs human review, most important first
-  - last, the stop: what the human does now, and what happens after
+  - last, the stop: what the human does now, and what happens after. Once nothing is left, say to start a new session for the next request; the docs carry everything.
