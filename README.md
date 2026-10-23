@@ -126,7 +126,9 @@ This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to instal
 2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc and slices as GitHub issues.
 3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
 
-To build an existing plan, run `/drive-feature docs/features/NNNN-*.md`, or `/build-slice <issue>` for one slice. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
+To build an existing plan:
+- **In one session:** `/drive-feature docs/features/NNNN-*.md`. Add a limit if you want to check as you go: "build 3 slices, at most 2 at once". It stops after each batch on the feature branch; `go` starts the next.
+- **One ticket per session** (for example, several sessions side by side): `/build-slice <issue URL>` in each. With no feature branch, each ticket gets its own PR into `main`, merged on your `go`. Pick tickets that don't touch the same code. When they're all done, run `/drive-feature docs/features/NNNN-*.md` once: it skips the finished slices and only does the finish (docs, `living-docs`, status). After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
 
 ## Status
 
