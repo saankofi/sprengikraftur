@@ -26,7 +26,7 @@ Principles that run through every skill:
 | `drive-feature` | Runs `build-slice` across a feature's slices, then reports once |
 
 Each skill works on its own; they coordinate only through the files above and their GitHub issues.
-Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool, `omp commit`), plus `gh` for issues, which the `github` tool can't create. If one is missing, the skill uses an equivalent, or stops and says so.
+Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool), plus `gh` for issues, which the `github` tool can't create. If one is missing, the skill uses an equivalent, or stops and says so.
 
 ## Config
 
@@ -47,8 +47,6 @@ How costly a mistake would be. It sets the rigour (edge-case tests, how strict t
 - **`medium`:** asks where a wrong guess would record wrong data or be hard to undo, for example how currencies are handled.
 - **`high`:** asks about any business rule that isn't written down.
 
-Technical choices are never asked; architecture and outside commitments always come to you as proposed ADRs. A feature doc can raise or lower risk for that feature, with a reason.
-
 ### `approve`
 
 Everything runs on its own except the steps listed in `approve`. At each one the agent stops and says what to check, what to reply, and what happens next.
@@ -68,6 +66,10 @@ Everything runs on its own except the steps listed in `approve`. At each one the
 You never merge anything yourself: approving is replying `go` in the session.
 
 Small changes skip the feature machinery: a one-line fix is just done, and a single-slice ticket gets its own PR into `main`, which waits for your `go` if `merge` is set.
+
+### `ci_budget`
+
+How long CI should take: `unit` for the unit tests, `full` for the whole run. When CI takes longer, `build-slice` opens an issue to speed it up, if there isn't one open already.
 
 ### `docs`
 
@@ -128,10 +130,10 @@ This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to instal
 ### Daily use
 
 1. **Start a new session for each request.** The docs carry the context, so a fresh session loses nothing, and it's cheaper and sharper than one that has run for days.
-2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc, plus a GitHub feature issue with the slices as its sub-issues.
+2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc, plus a GitHub feature issue with the slices as its sub-issues. The doc reaches `main` on its own PR, which the agent merges without waiting for `merge`, so a session started from any of the issues can read it.
 3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
 
-Every issue the bundle creates starts with the command that builds it, so you can start work from Orca's issue list. Filter it with `is:open label:feature` for the features, or `is:open label:ready-for-agent -label:slice` for everything you can start at the top level (features and tickets).
+Every issue the bundle creates starts with the command that builds it, so you can start work from Orca's issue list. Filter it with `is:open label:feature` for the features, `is:open label:ready-for-agent -label:slice` for everything you can start at the top level (features and tickets), or `label:feature:NNNN` for one feature and its slices. Orca doesn't show sub-issues or filter on them, so each slice also links to its feature issue.
 
 To build an existing plan:
 - **In one session:** start the feature issue from Orca, or run `/drive-feature <feature issue URL or docs/features/NNNN-*.md>`. It builds the slices the plan marks as buildable together in parallel, and the rest in dependency order, closes each slice's issue as it merges, and the final PR closes the feature issue. To check as you go, or to build fewer at once, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
@@ -145,11 +147,13 @@ To build an existing plan:
 
 ## Status
 
-Tested on six runs: a receipt-scanner MVP and two features on top of it with Opus and GPT, then the MVP again with cheap models and finally with Opus planning and GLM building. Not yet checked:
+Tested on six runs: a receipt-scanner MVP and two features on top of it with Opus and GPT, then the MVP again with cheap models and with Opus planning and GLM building, and finally a first real project. Not yet checked:
 1. Using the `github` tool's Actions watch for the CI fix loop.
 2. Whether goal or loop mode helps `drive-feature`.
 3. `approve: [slice]`.
 4. Starting issues from Orca's issue list.
+5. Putting the feature doc on `main` through its own PR.
+6. Picking a feature back up in a new session, on its existing feature branch.
 
 Write-ups of test runs are in [`runs/`](runs/).
 
