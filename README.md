@@ -2,6 +2,23 @@
 
 A small skill bundle for building software with strong LLM agents on [oh-my-pi (omp)](https://github.com/can1357/oh-my-pi).
 
+```mermaid
+flowchart LR
+    A["You: one request"] --> B["plan-feature<br>one batch of questions,<br>feature doc, issues"]
+    B --> C["drive-feature"]
+    C --> S1 & S2 & S3
+    subgraph slices ["build-slice, one subagent per slice, in parallel where the plan allows"]
+        S1["slice 1"]
+        S2["slice 2"]
+        S3["slice 3"]
+    end
+    S1 & S2 & S3 --> F["feature branch"]
+    F --> G["living-docs<br>docs match what shipped"] --> H["one PR into main"]
+    H -->|"you: go"| M["main"]
+```
+
+Each slice: acceptance tests first, built, run for real, reviewed by a different model, PR with green CI. You answer one batch of questions at the start and reply `go` at the end; everything between runs on its own.
+
 ## Philosophy
 
 **Guide how the agent works, not how it does the work.** The skills set direction, boundaries and a definition of done, and leave the technique to the model. Less is more: every line in a skill should change behaviour. The bundle therefore assumes a strong model; weaker models need a more prescriptive process than this one.
@@ -12,7 +29,7 @@ Principles that run through every skill:
 2. **Ask about the business, decide the technical.** Business rules (what gets recorded, money, who can do what, what users see) are never guessed silently. Technical choices are the agent's, recorded as it goes. Architecture and commitments outside the codebase (third parties, cost, data leaving the system, licenses) are proposed as ADRs for the human to accept. Questions come in one batch, each with a default, so `go` answers them all.
 3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
 4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria. The plan marks which slices can be built together, and those are built in parallel; rules they share are settled in the feature doc first, so each slice doesn't invent its own.
-5. **One builder, one independent reviewer.** Acceptance tests first, a real end-to-end check, and a review by a different model before the PR. Unit tests stay, and each core flow keeps a happy-path end-to-end test through what users use.
+5. **One builder, one independent reviewer.** Acceptance tests first, deleted once green; a real end-to-end check; and a review by a different model before the PR. What stays is the unit tests and one happy-path end-to-end test per core flow, through what users use, so the suite stays fast.
 6. **Stop only where a human is needed.** Run every other step. At a stop, say exactly what to do and what happens after, so nothing has to be remembered.
 
 ## Skills
@@ -35,9 +52,11 @@ A YAML block in a `## Sprengikraftur` section of the project's `AGENTS.md` (the 
 ```yaml
 risk: medium                 # low | medium | high; a feature doc may override this, with a reason
 approve: [merge]             # spec | plan | slice | merge: wait for the human at these points
-ci_budget: { unit: 30s, full: 5m }
+ci_budget: 5m                # how long CI may take
 docs: docs                   # folder for the docs, ADRs and feature docs
 ```
+
+Missing keys take the defaults.
 
 ### `risk`
 
@@ -55,12 +74,12 @@ Everything runs on its own except the steps listed in `approve`. At each one the
 |---|---|---|---|
 | `spec` | After the feature doc's deliverables and acceptance criteria, before slicing | Check *what* gets built. Reply `go` or say what to change | It plans the slices |
 | `plan` | After the slices are planned, before building | Check what gets built and how it's cut. Reply `go` or say what to change | It builds every slice |
-| `slice` | After each slice is built, reviewed and merged into the feature branch | Try it: the stop says how to run it and what to check. Reply `go` or report a problem | It fixes the problem, or starts the next slice |
+| `slice` | After each slice, or each batch built together, is built, reviewed and merged into the feature branch | Try it: the stop says how to run it and what to check. Reply `go` or report a problem | It fixes the problem, or starts the next slice |
 | `merge` | After every slice is done and the docs are refreshed on the feature branch | Review the one PR (or branch) into `main` and its checklist of human-only checks. Reply `go` | It checks CI, merges into `main` and cleans up the branches. The feature is done |
 
 - **`[merge]` (default):** you only see the finished feature.
 - **`[plan, merge]`:** also catches wrong guesses about the product before any code is written. Use it with models that don't ask questions (see [run 4](runs/2026-10-14-receipt-scanner-cheap-models.md)).
-- **`[slice, merge]`:** test as you go; use it when you want to see each step working on a real device or real data.
+- **`[slice, merge]`:** test as you go; use it when you want to see each step working on a real device or real data. To see every slice on its own, add "one at a time" to the command.
 - **`[]`:** fully hands-off; the agent merges into `main` as soon as CI passes.
 
 You never merge anything yourself: approving is replying `go` in the session.
@@ -69,7 +88,7 @@ Small changes skip the feature machinery: a one-line fix is just done, and a sin
 
 ### `ci_budget`
 
-How long CI should take: `unit` for the unit tests, `full` for the whole run. When CI takes longer, `build-slice` opens an issue to speed it up, if there isn't one open already.
+How long CI may take. When it takes longer, `build-slice` opens an issue to speed it up, if there isn't one open already.
 
 ### `docs`
 
@@ -94,7 +113,7 @@ modelRoles:
 
 Without `task`, builders run on `default`. Keep `task` and `slow` different. On a subscription, choose by quota rather than price: a cheaper builder still saves most of it, because building uses most of the tokens.
 
-Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested; prices per million tokens in/out on OpenRouter, October 2026):
+Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested, – not worth testing for that job; prices per million tokens in/out on OpenRouter, October 2026):
 
 | Model | In / out | Plan | Build | Review |
 |---|---|---|---|---|
@@ -103,21 +122,21 @@ Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested; prices pe
 | `anthropic/claude-sonnet-5.5` | $2 / $10 | ? | ? | ? |
 | `openai/gpt-6-astra` | $10 / $50 | ? | – | – |
 | `openai/gpt-6.1-sol` | $2 / $10 | ? | ? | ✓ |
-| `z-ai/glm-5.3` | $0.08 / $4.80 | ✗ | ✓ | ? |
-| `moonshotai/kimi-k3` | $0.50 / $15 | ✗ | ? | ✓ |
-| `deepseek/deepseek-v4-pro` | $0.66 / $1.98 | ? | ? | ? |
-| `qwen/qwen3.8-max` | $2 / $6 | ? | ? | ? |
-| `moonshotai/kimi-k2.7-code` | $0.67 / $3.35 | ✗ | ✗ | – |
+| `z-ai/glm-5.3` | $0.07 / $1.40 | ✗ | ✓ | ? |
+| `moonshotai/kimi-k3.1-pro` | $2 / $10 | ? | ? | ? |
+| `moonshotai/kimi-k3` | $0.24 / $10.80 | ✗ | ? | ✓ |
+| `deepseek/deepseek-v4-pro` | $0.96 / $1.91 | ? | ? | ? |
+| `qwen/qwen3.8-max-0902` | $2 / $6 | ? | ? | ? |
 
-Proven so far: **Opus plans, GLM 5.3 builds, GPT-6.1 Sol or Kimi K3 reviews**, for about $6 for a small MVP. On a real 5-day project with Opus building, building was 70% of the cost. Cheap models plan badly: they fill business gaps with silent defaults and state unchecked facts. The smallest tiers (Haiku, GPT Luna, the Flash models) are untested and probably too small to build.
+Proven so far: **Opus plans, GLM 5.3 builds, GPT-6.1 Sol or Kimi K3 reviews**, for about $6 for a small MVP. On a real 5-day project with Opus building, building was 70% of the cost. Cheap models plan badly: they fill business gaps with silent defaults and state unchecked facts. Kimi K2.7 Code couldn't drive the bundle at all ([run 4](runs/2026-10-14-receipt-scanner-cheap-models.md)). The smallest tiers (Haiku, GPT Luna, the Flash models) are untested and probably too small to build.
 
 ## Install
 
 ```sh
-npx skills add saankofi/sprengikraftur -g -a universal
+npx skills add saankofi/sprengikraftur -g -a pi
 ```
 
-This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to install into one project's `.agents/skills` instead. Check with `omp read skill://plan-feature`; update with `npx skills update -g`.
+`pi` is omp's upstream, so this installs into `~/.agents/skills`, which omp reads. Leave out `-g` to install into one project's `.agents/skills` instead. Check with `omp read skill://plan-feature`; update with `npx skills update -g`.
 
 ## Usage
 
@@ -144,6 +163,26 @@ To build an existing plan:
   /drive-feature docs/features/0003-csv-export.md build only slice 2
   ```
 - **One slice or ticket per session** (for example, several sessions side by side): start its issue from Orca, or run `/build-slice <issue URL>`. With no feature branch, each gets its own PR into `main` that closes its issue, merged on your `go`. Pick slices the feature doc marks as buildable together. When the last slice of a feature merges, its stop tells you to start the feature issue from Orca: it skips the finished slices, does only the finish (docs, `living-docs`, status), and its PR closes the feature issue. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
+
+## Many features at once
+
+The bundle is built for an agent development environment (ADE) such as Orca: a window with the repo's issue list, where each issue starts a session in its own worktree. Every issue the bundle creates begins with the command that builds it, so starting one from the list is the whole handoff.
+
+```mermaid
+flowchart LR
+    Y["You"] --> O["Orca: the repo's issue list"]
+    O --> F1["session: feature 12<br>drive-feature"]
+    O --> F2["session: feature 13<br>drive-feature"]
+    O --> T["session: ticket 14<br>build-slice"]
+    F1 --> A1["slice"] & A2["slice"] & A3["slice"]
+    F2 --> B1["slice"] & B2["slice"]
+    A1 & A2 & A3 --> M1["PR into main"]
+    B1 & B2 --> M2["PR into main"]
+    T --> M3["PR into main"]
+    M1 & M2 & M3 -->|"you: go"| M["main"]
+```
+
+One session per feature or ticket, one subagent per slice, each in its own worktree. Your job is the plan stops and the `go` on each PR into `main`; the docs on `main` carry the context, so sessions don't need each other. Without an ADE, the same thing is several omp sessions side by side, started by hand with the issue URLs.
 
 ## Status
 
