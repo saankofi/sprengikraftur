@@ -21,7 +21,7 @@ Principles that run through every skill:
 |---|---|
 | `living-docs` | Creates or refreshes `AGENTS.md` and `docs/{BUSINESS,PRODUCT,ARCHITECTURE,DESIGN}.md` (BUSINESS and DESIGN are optional) |
 | `adr` | Records a decision in `docs/adr/NNNN-*.md` |
-| `plan-feature` | Triage, then `docs/features/NNNN-*.md` plus slices as GitHub issues |
+| `plan-feature` | Triage, then `docs/features/NNNN-*.md` plus a feature issue with its slices as sub-issues |
 | `build-slice` | Builds one slice to done: tests, end-to-end check, review, PR, green CI, docs updated |
 | `drive-feature` | Runs `build-slice` across a feature's slices, then reports once |
 
@@ -128,11 +128,13 @@ This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to instal
 ### Daily use
 
 1. **Start a new session for each request.** The docs carry the context, so a fresh session loses nothing, and it's cheaper and sharper than one that has run for days.
-2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc and slices as GitHub issues.
+2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc, plus a GitHub feature issue with the slices as its sub-issues.
 3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
 
+Every issue the bundle creates starts with the command that builds it, so you can start work from Orca's issue list. Filter it with `is:open label:feature` for the features, or `is:open label:ready-for-agent -label:slice` for everything you can start at the top level (features and tickets).
+
 To build an existing plan:
-- **In one session:** `/drive-feature docs/features/NNNN-*.md`. It builds the slices the plan marks as buildable together in parallel, and the rest in dependency order. To check as you go, or to build fewer at once, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
+- **In one session:** start the feature issue from Orca, or run `/drive-feature <feature issue URL or docs/features/NNNN-*.md>`. It builds the slices the plan marks as buildable together in parallel, and the rest in dependency order, closes each slice's issue as it merges, and the final PR closes the feature issue. To check as you go, or to build fewer at once, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
   ```
   /drive-feature docs/features/0003-csv-export.md build 3 slices, then stop
   /drive-feature docs/features/0003-csv-export.md at most 2 at once
@@ -146,6 +148,7 @@ Tested on six runs: a receipt-scanner MVP and two features on top of it with Opu
 1. Using the `github` tool's Actions watch for the CI fix loop.
 2. Whether goal or loop mode helps `drive-feature`.
 3. `approve: [slice]`.
+4. Starting issues from Orca's issue list.
 
 Write-ups of test runs are in [`runs/`](runs/).
 
