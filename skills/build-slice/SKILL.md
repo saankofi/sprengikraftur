@@ -24,6 +24,7 @@ Build only this slice. Anything else you notice goes in the report.
 ## How to work
 
 - Read `AGENTS.md` and the relevant docs first; given a slice issue, also the feature doc its feature issue links to. What's written is binding; if something looks wrong, flag it rather than working around it.
+- If the slice depends on one that isn't done (its issue is open, or it isn't ticked off in the feature doc), stop and say which to build first.
 - Make technical decisions yourself and keep a decision ledger: what you decided, and what it costs if wrong. It goes in the PR description.
 - Stop and ask only about a business rule the docs and acceptance criteria don't settle, or something that commits outside the codebase (a new service or vendor, cost, data leaving the system). Technical questions are yours.
 - Let risk set the rigour: higher risk gets more edge-case tests and a stricter review. Rigour scales with the cost of being wrong, not with what's possible.
