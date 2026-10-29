@@ -6,9 +6,10 @@ A small skill bundle for building software with strong LLM agents on [oh-my-pi (
 flowchart TB
     Y["You: requests"] --> P["plan-feature, one session per request<br>one batch of questions, feature doc, issues"]
     P --> O["ADE such as Orca: the repo's issue list"]
-    O --> F1["session: feature 12<br>drive-feature"]
     O --> F2["session: feature 13<br>drive-feature"]
+    O --> F1["session: feature 12<br>drive-feature"]
     O --> T["session: ticket 14<br>build-slice"]
+    F2 --> F2s["its slices, the same way"] --> PR2["PR into main"]
     subgraph S ["build-slice: one subagent per slice, in parallel where the plan allows"]
         direction LR
         A1["slice 1"]
@@ -18,9 +19,8 @@ flowchart TB
     F1 --> A1 & A2 & A3
     A1 & A2 & A3 --> B["feature branch"]
     B --> L["living-docs<br>docs match what shipped"] --> PR1["PR into main"]
-    F2 --> F2s["its slices, the same way"] --> PR2["PR into main"]
     T --> PR3["PR into main"]
-    PR1 & PR2 & PR3 -->|"you: go"| M["main"]
+    PR2 & PR1 & PR3 -->|"you: go"| M["main"]
 ```
 
 Each slice: acceptance tests first, built, run for real, reviewed by a different model, PR with green CI. One session per feature or ticket, one subagent per slice, each in its own worktree; every issue starts with the command that builds it, so starting it from the ADE's issue list is the whole handoff. You answer one batch of questions at the start and reply `go` at the end; the docs on `main` carry the context between sessions. Without an ADE, it's several omp sessions side by side, started with the issue URLs.
