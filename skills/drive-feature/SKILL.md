@@ -23,6 +23,7 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 
 ## Finish
 
+- Check that every core flow the feature doc lists has a passing happy-path end-to-end test, as `build-slice` defines it. Get a missing one built with `build-slice`; don't skip it. Flag gaps from before this feature in the report.
 - Check that the docs describe what actually shipped: PRODUCT, ARCHITECTURE, ADRs, the feature doc. Fix any drift you find in them, including drift from before this feature. Check new ADRs against older ones; supersede any they contradict. Where docs conflict on a product rule, say which rule the code follows today, and flag it.
 - Then run the `living-docs` skill on the feature branch, even if the docs look current. (If the slices were merged into `main` one by one, do the finish on a short branch from `main`.) Set the status to `shipped`.
 - Open one PR from the feature branch into `main`, with the report as its description and the checks only a human can do (real devices, real files) as a checklist. If `approve` includes `merge`, stop for the human's approval; once they approve, check CI is green, merge it yourself, and clean up the branches. Otherwise merge it once CI passes.
