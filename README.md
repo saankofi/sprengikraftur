@@ -25,8 +25,8 @@ Principles that run through every skill:
 | `build-slice` | Builds one slice to done: tests, end-to-end check, review, PR, green CI, docs updated |
 | `drive-feature` | Runs `build-slice` across a feature's slices, then reports once |
 
-Each skill works on its own; they coordinate only through the files above.
-Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool, `omp commit`). If one is missing, the skill uses an equivalent, or stops and says so.
+Each skill works on its own; they coordinate only through the files above and their GitHub issues.
+Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool, `omp commit`), plus `gh` for issues, which the `github` tool can't create. If one is missing, the skill uses an equivalent, or stops and says so.
 
 ## Config
 
