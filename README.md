@@ -139,8 +139,9 @@ To build an existing plan:
   /drive-feature docs/features/0003-csv-export.md build 3 slices, then stop
   /drive-feature docs/features/0003-csv-export.md at most 2 at once
   /drive-feature docs/features/0003-csv-export.md one slice at a time, I'll test each on my phone
+  /drive-feature docs/features/0003-csv-export.md build only slice 2
   ```
-- **One ticket per session** (for example, several sessions side by side): `/build-slice <issue URL>` in each. With no feature branch, each ticket gets its own PR into `main`, merged on your `go`. Pick tickets the feature doc marks as buildable together. When they're all done, run `/drive-feature docs/features/NNNN-*.md` once: it skips the finished slices and only does the finish (docs, `living-docs`, status). After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
+- **One slice or ticket per session** (for example, several sessions side by side): start its issue from Orca, or run `/build-slice <issue URL>`. With no feature branch, each gets its own PR into `main` that closes its issue, merged on your `go`. Pick slices the feature doc marks as buildable together. When the last slice of a feature merges, its stop tells you to start the feature issue from Orca: it skips the finished slices, does only the finish (docs, `living-docs`, status), and its PR closes the feature issue. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
 
 ## Status
 
