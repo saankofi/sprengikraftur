@@ -9,6 +9,8 @@ Ship one slice so it's verifiably done and the docs still tell the truth.
 
 Build only this slice. Anything else you notice goes in the report.
 
+`docs/` here means the folder set by `docs` in `AGENTS.md` (default `docs`).
+
 ## Done means
 
 - Acceptance tests came first: one per acceptance criterion, at the outermost level that shows it (the browser for a UI flow, the API for a backend rule), seen failing. The inside was then test-driven until they passed.

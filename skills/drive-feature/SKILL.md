@@ -9,6 +9,8 @@ Get a whole feature built while the human is away, then hand back one clear repo
 
 Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 
+`docs/` here means the folder set by `docs` in `AGENTS.md` (default `docs`).
+
 ## How to work
 
 - Read the feature doc and `AGENTS.md`. Set the feature's status to `building`. Slices already ticked off in the feature doc are done; skip them.

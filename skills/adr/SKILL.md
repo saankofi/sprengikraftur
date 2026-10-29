@@ -7,6 +7,8 @@ description: Record an architecture or technical decision as a numbered ADR in d
 
 Record why something is the way it is, so nobody relitigates it. Only record the decision; don't implement it.
 
+`docs/` here means the folder set by `docs` in `AGENTS.md` (default `docs`).
+
 - One decision per file: `docs/adr/NNNN-short-slug.md`, numbered after the highest existing number.
 - Cover: context, the decision, alternatives considered, consequences, status (`proposed`, `accepted`, or `superseded by NNNN`).
 - Keep it short. A few paragraphs at most.

@@ -36,6 +36,7 @@ A YAML block in a `## Sprengikraftur` section of the project's `AGENTS.md` (the 
 risk: medium                 # low | medium | high; a feature doc may override this, with a reason
 approve: [merge]             # spec | plan | slice | merge: wait for the human at these points
 ci_budget: { unit: 30s, full: 5m }
+docs: docs                   # folder for the docs, ADRs and feature docs
 ```
 
 ### `risk`
@@ -67,6 +68,10 @@ Everything runs on its own except the steps listed in `approve`. At each one the
 You never merge anything yourself: approving is replying `go` in the session.
 
 Small changes skip the feature machinery: a one-line fix is just done, and a single-slice ticket gets its own PR into `main`, which waits for your `go` if `merge` is set.
+
+### `docs`
+
+Where the docs, ADRs and feature docs live; every `docs/` path in the skills and in this README means this folder. Leave it as `docs` unless `docs/` already has another job, such as a published docs site; then use something like `docs/sprengikraftur`. `living-docs` checks for this when it first adds the config block, and asks. `AGENTS.md` always stays at the repo root. To move the docs later, change `docs` and run `/living-docs`; it moves them and fixes the links.
 
 ## Models
 
