@@ -11,7 +11,7 @@ Principles that run through every skill:
 1. **Docs are the current truth.** A few short docs say why and what; code and tests show how. Updating the docs is part of done.
 2. **Ask about the business, decide the technical.** Business rules (what gets recorded, money, who can do what, what users see) are never guessed silently. Technical choices are the agent's, recorded as it goes. Architecture and commitments outside the codebase (third parties, cost, data leaving the system, licenses) are proposed as ADRs for the human to accept. Questions come in one batch, each with a default, so `go` answers them all.
 3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
-4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria.
+4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria. The plan marks which slices can be built together, and those are built in parallel; rules they share are settled in the feature doc first, so each slice doesn't invent its own.
 5. **One builder, one independent reviewer.** Acceptance tests first, a real end-to-end check, and a review by a different model before the PR.
 6. **Stop only where a human is needed.** Run every other step. At a stop, say exactly what to do and what happens after, so nothing has to be remembered.
 
@@ -132,13 +132,13 @@ This installs into `~/.agents/skills`, which omp reads. Leave out `-g` to instal
 3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
 
 To build an existing plan:
-- **In one session:** `/drive-feature docs/features/NNNN-*.md`. To check as you go, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
+- **In one session:** `/drive-feature docs/features/NNNN-*.md`. It builds the slices the plan marks as buildable together in parallel, and the rest in dependency order. To check as you go, or to build fewer at once, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
   ```
   /drive-feature docs/features/0003-csv-export.md build 3 slices, then stop
   /drive-feature docs/features/0003-csv-export.md at most 2 at once
   /drive-feature docs/features/0003-csv-export.md one slice at a time, I'll test each on my phone
   ```
-- **One ticket per session** (for example, several sessions side by side): `/build-slice <issue URL>` in each. With no feature branch, each ticket gets its own PR into `main`, merged on your `go`. Pick tickets that don't touch the same code. When they're all done, run `/drive-feature docs/features/NNNN-*.md` once: it skips the finished slices and only does the finish (docs, `living-docs`, status). After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
+- **One ticket per session** (for example, several sessions side by side): `/build-slice <issue URL>` in each. With no feature branch, each ticket gets its own PR into `main`, merged on your `go`. Pick tickets the feature doc marks as buildable together. When they're all done, run `/drive-feature docs/features/NNNN-*.md` once: it skips the finished slices and only does the finish (docs, `living-docs`, status). After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
 
 ## Status
 

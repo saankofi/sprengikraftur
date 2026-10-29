@@ -28,7 +28,7 @@ Then ask: **does this change the architecture?** A new component, storage, servi
 - **acceptance criteria:** observable and testable
 - **out of scope**
 - **risk:** inherits the project default; any override needs a reason
-- **slices:** with links to their issues
+- **slices:** with links to their issues, and which can be built together
 - **assumptions and decisions** made along the way. Owner decisions go in PRODUCT.md or an ADR; link to them rather than repeating them.
 - **status:** `planned`, `building` or `shipped`
 
@@ -38,8 +38,11 @@ Describe what and why. Leave the how to the builder, except where architecture o
 
 - Each slice is vertical: it works end to end and delivers something observable.
 - Size slices by what they deliver, not by count. One slice is fine; so is ten.
-- Each slice has its own acceptance criteria and notes any known risks.
-- Create them as GitHub issues (omp's `github` tool) labelled `feature:NNNN` and `ready-for-agent`, with dependencies noted. With no issue tracker, list them in the feature doc.
+- Before slicing, settle in the feature doc any rule that several slices share (how a value is parsed, shown or checked), asking as below, so slices built in parallel don't each invent their own.
+- Where two cuts are equally vertical, choose the one that lets more slices be built together. Never give up verticality for it: no slice becomes a layer (only the schema, only the API) to free up another.
+- Each slice has its own acceptance criteria and notes any known risks, its dependencies, and what it touches: screens, tables, modules, rules.
+- In the feature doc, show which slices can be built together: those with no dependency between them and no screen, table or module in common. A shared rule is fine once the feature doc settles it. For example: "1 first; then 2, 3 and 4 together; 5 after 3."
+- Create them as GitHub issues (omp's `github` tool) labelled `feature:NNNN` and `ready-for-agent`, with dependencies and what they touch noted. With no issue tracker, list them in the feature doc.
 
 ## Working with the human
 
