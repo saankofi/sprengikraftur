@@ -13,12 +13,12 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 
 ## How to work
 
-- Read the feature doc (given a feature issue, the doc it links to) and `AGENTS.md`. Set the feature's status to `building`. Slices already ticked off in the feature doc are done; skip them.
+- Read the feature doc (given a feature issue, the doc it links to) and `AGENTS.md`. Set the feature's status to `building`. Slices already ticked off in the feature doc are done; skip them. If none are left, go straight to the finish.
 - Work on a branch `feature/NNNN-short-slug` from `main`. Each slice's PR targets it and is merged once review and CI pass.
 - Build each slice with `build-slice`, in dependency order, each in its own `task` subagent. Keep your own context small: take back only each slice's report, never its diffs. If a slice's subagent dies, resume it or start a new one from where it stopped; don't finish the slice yourself.
 - When a slice's PR merges into the feature branch, close its issue with `gh issue close`: GitHub closes issues only for PRs into the default branch.
 - By default, build in parallel the slices the feature doc marks as buildable together, each in an isolated worktree. If the doc doesn't mark them, build slices one after another, and in parallel only when they change different parts of the code; if two touch the same screen, table, module or rule, build them in sequence.
-- If the human gives a limit ("build 3 slices", "at most 2 at once", "one at a time"), keep to it. After that many slices, stop as for `slice` below, and on `go` carry on with the next batch.
+- If the human asks for only slice N, build just that slice, then stop; don't start other slices or the finish. If they give a limit ("build 3 slices", "at most 2 at once", "one at a time"), keep to it. After that many slices, stop as for `slice` below, and on `go` carry on with the next batch.
 - If `approve` includes `slice`, stop after each slice is merged into the feature branch so the human can try it: how to run it, what to try (its acceptance criteria), and the checks only a human can do. On `go`, start the next slice; if they report a problem, fix it first.
 - Stop for the human only at a step listed in `approve` (read it from `AGENTS.md` when you get there; the human may have changed it), or when a question blocks the work. When you stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …"). Otherwise keep going: park the blocked slice and carry on with the others.
 
