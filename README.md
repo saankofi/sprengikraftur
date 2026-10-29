@@ -12,7 +12,7 @@ Principles that run through every skill:
 2. **Ask about the business, decide the technical.** Business rules (what gets recorded, money, who can do what, what users see) are never guessed silently. Technical choices are the agent's, recorded as it goes. Architecture and commitments outside the codebase (third parties, cost, data leaving the system, licenses) are proposed as ADRs for the human to accept. Questions come in one batch, each with a default, so `go` answers them all.
 3. **What's written is binding.** Anything the human wrote or approved is a requirement. Fill the gaps; flag conflicts rather than silently "improving" things.
 4. **Vertical slices, sized by what they deliver.** Each slice works end to end and has acceptance criteria.
-5. **One builder, one independent reviewer.** Acceptance tests first, a real end-to-end check, and a review by a different model before the PR.
+5. **One builder, one independent reviewer.** Acceptance tests first, a real end-to-end check, and a review by a different model before the PR. Unit tests stay, and each core flow keeps a happy-path end-to-end test through what users use.
 6. **Stop only where a human is needed.** Run every other step. At a stop, say exactly what to do and what happens after, so nothing has to be remembered.
 
 ## Skills

@@ -26,6 +26,7 @@ Then ask: **does this change the architecture?** A new component, storage, servi
 - **why:** the problem and who has it
 - **deliverables:** what will exist when it's done
 - **acceptance criteria:** observable and testable
+- **core flows:** which flows in `docs/PRODUCT.md` the feature adds or changes, or none
 - **out of scope**
 - **risk:** inherits the project default; any override needs a reason
 - **slices:** with links to their issues
