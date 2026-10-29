@@ -18,6 +18,8 @@ A request may hold several unrelated changes; triage and plan each on its own. C
 - **ticket:** one slice. A single issue with acceptance criteria.
 - **feature:** anything bigger, or touching money, auth, deleting data, the data model, or a new external service.
 
+A request about a feature that has shipped is new work: triage it on its own, and don't reopen the feature or its issues.
+
 Then ask: **does this change the architecture?** A new component, storage, service or deployment shape, or a change across the codebase (auth, background jobs). If so, decide it before slicing: ADRs (use the `adr` skill) and `docs/ARCHITECTURE.md`, then make the first slice a thin path through the new structure, end to end. Usually the answer is no, in one line.
 
 ## The feature doc
@@ -29,11 +31,11 @@ Then ask: **does this change the architecture?** A new component, storage, servi
 - **core flows:** which flows in `docs/PRODUCT.md` the feature adds or changes, or none
 - **out of scope**
 - **risk:** inherits the project default; any override needs a reason
-- **slices:** with links to the feature issue and the slices' issues, and which slices can be built together
+- **slices** (below), with links to the issues
 - **assumptions and decisions** made along the way. Owner decisions go in PRODUCT.md or an ADR; link to them rather than repeating them.
-- **status:** `planned`, `building` or `shipped`
+- **status:** `planned` or `shipped`
 
-Describe what and why. Leave the how to the builder, except where architecture or third-party choices need deciding (use the `adr` skill).
+Describe what and why; leave the how to the builder.
 
 ## Slices
 
@@ -46,12 +48,14 @@ Describe what and why. Leave the how to the builder, except where architecture o
 
 ## Issues
 
-Create issues with `gh` (omp's `github` tool can't create them), adding any missing label with `gh label create`. Each body starts with the command that builds it, so a session started from the issue runs the right skill: create the issue, then put that line at the top with `gh issue edit`.
-- **Feature:** one issue labelled `feature`, `feature:NNNN` and `ready-for-agent`, starting `/drive-feature <its URL>`, then a short summary and a link to the feature doc. Don't copy the deliverables or acceptance criteria; the doc stays the truth. Link the issue from the doc.
-- **Slices:** each a sub-issue, `gh issue create --parent <feature issue> --label slice,feature:NNNN,ready-for-agent`, starting `/build-slice <its URL>`, then its acceptance criteria, dependencies, the slices it can be built with, and what it touches.
+Create issues with `gh` (omp's `github` tool can't create them). Each body starts with the command that builds it, so a session started from the issue runs the right skill.
+- **Feature:** one issue labelled `feature`, `feature:NNNN` and `ready-for-agent`, starting `/drive-feature <its URL>`, then a short summary and a link to the feature doc. Don't copy the deliverables or acceptance criteria; the doc stays the truth.
+- **Slices:** each a sub-issue of it (`gh issue create --parent`), labelled `slice`, `feature:NNNN` and `ready-for-agent`, starting `/build-slice <its URL>`, then a link to the feature issue, its acceptance criteria, dependencies, the slices it can be built with, and what it touches. Orca doesn't show sub-issues or filter on them, so the `feature:NNNN` label and that link are how the human finds a feature's slices there.
 - **Ticket:** one issue labelled only `ready-for-agent`, starting `/build-slice <its URL>`, then its acceptance criteria.
 
 With no issue tracker, list the slices in the feature doc.
+
+Once the plan is final (after `go` at any `spec` or `plan` stop), create the issues. For a feature, link them in the doc, then put the doc and any ADRs on `main` through a PR of their own, and merge it once checks pass, so a session started from an issue finds them. It's a plan, not code: `merge` in `approve` doesn't hold it. With no GitHub remote, commit them to `main`.
 
 ## Working with the human
 

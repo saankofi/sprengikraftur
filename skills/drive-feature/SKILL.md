@@ -13,11 +13,10 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 
 ## How to work
 
-- Read the feature doc (given a feature issue, the doc it links to) and `AGENTS.md`. Set the feature's status to `building`. Slices already ticked off in the feature doc are done; skip them. If none are left, go straight to the finish.
-- Work on a branch `feature/NNNN-short-slug` from `main`. Each slice's PR targets it and is merged once review and CI pass.
-- Build each slice with `build-slice`, in dependency order, each in its own `task` subagent. Keep your own context small: take back only each slice's report, never its diffs. If a slice's subagent dies, resume it or start a new one from where it stopped; don't finish the slice yourself.
-- When a slice's PR merges into the feature branch, close its issue with `gh issue close`: GitHub closes issues only for PRs into the default branch.
-- By default, build in parallel the slices the feature doc marks as buildable together, each in an isolated worktree. If the doc doesn't mark them, build slices one after another, and in parallel only when they change different parts of the code; if two touch the same screen, table, module or rule, build them in sequence.
+- Read `AGENTS.md`. Work on the feature's branch `feature/NNNN-short-slug`: the existing one if an earlier session started it, otherwise a new one from `main`.
+- On it, read the feature doc (given a feature issue, the doc it links to). Slices already ticked off in it are done; skip them. If none are left, go straight to the finish.
+- Build each slice with `build-slice` in its own `task` subagent, in dependency order. Keep your own context small: take back only each slice's report, never its diffs. If a slice's subagent dies, resume it or start a new one from where it stopped.
+- By default, build in parallel the slices the feature doc marks as buildable together, each in an isolated worktree. If the doc doesn't mark them, build in parallel only slices that share no screen, table, module or rule.
 - If the human asks for only slice N, build just that slice, then stop; don't start other slices or the finish. If they give a limit ("build 3 slices", "at most 2 at once", "one at a time"), keep to it. After that many slices, stop as for `slice` below, and on `go` carry on with the next batch.
 - If `approve` includes `slice`, stop after each slice is merged into the feature branch so the human can try it: how to run it, what to try (its acceptance criteria), and the checks only a human can do. On `go`, start the next slice; if they report a problem, fix it first.
 - Stop for the human only at a step listed in `approve` (read it from `AGENTS.md` when you get there; the human may have changed it), or when a question blocks the work. When you stop, say exactly what to do, what to check, and what happens after ("reply `go` and I'll …"). Otherwise keep going: park the blocked slice and carry on with the others.
@@ -26,7 +25,7 @@ Don't build slices yourself: each one runs as `build-slice` in its own subagent.
 
 - Check that every core flow the feature doc lists has a passing happy-path end-to-end test, as `build-slice` defines it. Get a missing one built with `build-slice`; don't skip it. Flag gaps from before this feature in the report.
 - Check that the docs describe what actually shipped: PRODUCT, ARCHITECTURE, ADRs, the feature doc. Fix any drift you find in them, including drift from before this feature. Check new ADRs against older ones; supersede any they contradict. Where docs conflict on a product rule, say which rule the code follows today, and flag it.
-- Then run the `living-docs` skill on the feature branch, even if the docs look current. (If the slices were merged into `main` one by one, do the finish on a short branch from `main`.) Set the status to `shipped`.
+- Then run the `living-docs` skill on the feature branch, even if the docs look current. Set the status to `shipped`.
 - Open one PR from the feature branch into `main`, with the report as its description, `Closes #N` for the feature issue if there is one, and the checks only a human can do (real devices, real files) as a checklist. If `approve` includes `merge`, stop for the human's approval; once they approve, check CI is green, merge it yourself, and clean up the branches. Otherwise merge it once CI passes.
 - Hand back one report:
   - what shipped, with links
