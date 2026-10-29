@@ -3,21 +3,27 @@
 A small skill bundle for building software with strong LLM agents on [oh-my-pi (omp)](https://github.com/can1357/oh-my-pi).
 
 ```mermaid
-flowchart LR
-    A["You: one request"] --> B["plan-feature<br>one batch of questions,<br>feature doc, issues"]
-    B --> C["drive-feature"]
-    C --> S1 & S2 & S3
-    subgraph slices ["build-slice, one subagent per slice, in parallel where the plan allows"]
-        S1["slice 1"]
-        S2["slice 2"]
-        S3["slice 3"]
+flowchart TB
+    Y["You: requests"] --> P["plan-feature, one session per request<br>one batch of questions, feature doc, issues"]
+    P --> O["ADE such as Orca: the repo's issue list"]
+    O --> F1["session: feature 12<br>drive-feature"]
+    O --> F2["session: feature 13<br>drive-feature"]
+    O --> T["session: ticket 14<br>build-slice"]
+    subgraph S ["build-slice: one subagent per slice, in parallel where the plan allows"]
+        direction LR
+        A1["slice 1"]
+        A2["slice 2"]
+        A3["slice 3"]
     end
-    S1 & S2 & S3 --> F["feature branch"]
-    F --> G["living-docs<br>docs match what shipped"] --> H["one PR into main"]
-    H -->|"you: go"| M["main"]
+    F1 --> A1 & A2 & A3
+    A1 & A2 & A3 --> B["feature branch"]
+    B --> L["living-docs<br>docs match what shipped"] --> PR1["PR into main"]
+    F2 --> F2s["its slices, the same way"] --> PR2["PR into main"]
+    T --> PR3["PR into main"]
+    PR1 & PR2 & PR3 -->|"you: go"| M["main"]
 ```
 
-Each slice: acceptance tests first, built, run for real, reviewed by a different model, PR with green CI. You answer one batch of questions at the start and reply `go` at the end; everything between runs on its own.
+Each slice: acceptance tests first, built, run for real, reviewed by a different model, PR with green CI. One session per feature or ticket, one subagent per slice, each in its own worktree; every issue starts with the command that builds it, so starting it from the ADE's issue list is the whole handoff. You answer one batch of questions at the start and reply `go` at the end; the docs on `main` carry the context between sessions. Without an ADE, it's several omp sessions side by side, started with the issue URLs.
 
 ## Philosophy
 
@@ -32,18 +38,13 @@ Principles that run through every skill:
 5. **One builder, one independent reviewer.** Acceptance tests first, deleted once green; a real end-to-end check; and a review by a different model before the PR. What stays is the unit tests and one happy-path end-to-end test per core flow, through what users use, so the suite stays fast.
 6. **Stop only where a human is needed.** Run every other step. At a stop, say exactly what to do and what happens after, so nothing has to be remembered.
 
-## Skills
+## Install
 
-| Skill | Does |
-|---|---|
-| `living-docs` | Creates or refreshes `AGENTS.md` and `docs/{BUSINESS,PRODUCT,ARCHITECTURE,DESIGN}.md` (BUSINESS and DESIGN are optional) |
-| `adr` | Records a decision in `docs/adr/NNNN-*.md` |
-| `plan-feature` | Triage, then `docs/features/NNNN-*.md` plus a feature issue with its slices as sub-issues |
-| `build-slice` | Builds one slice to done: tests, end-to-end check, review, PR, green CI, docs updated |
-| `drive-feature` | Runs `build-slice` across a feature's slices, then reports once |
+```sh
+npx skills add saankofi/sprengikraftur -g -a pi
+```
 
-Each skill works on its own; they coordinate only through the files above and their GitHub issues.
-Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool), plus `gh` for issues, which the `github` tool can't create. If one is missing, the skill uses an equivalent, or stops and says so.
+`pi` is omp's upstream, so this installs into `~/.agents/skills`, which omp reads. Leave out `-g` to install into one project's `.agents/skills` instead. Check with `omp read skill://plan-feature`; update with `npx skills update -g`.
 
 ## Config
 
@@ -94,6 +95,45 @@ How long CI may take. When it takes longer, `build-slice` opens an issue to spee
 
 Where the docs, ADRs and feature docs live; every `docs/` path in the skills and in this README means this folder. Leave it as `docs` unless `docs/` already has another job, such as a published docs site; then use something like `docs/sprengikraftur`. `living-docs` checks for this when it first adds the config block, and asks. `AGENTS.md` always stays at the repo root. To move the docs later, change `docs` and run `/living-docs`; it moves them and fixes the links.
 
+## Usage
+
+### Setup (once per project)
+
+1. **Install** the skills and **set the model roles** (below).
+2. In omp, in the project's directory, run `/living-docs`, adding what you know: what it's for, who uses it, the stack. It reads any existing code and asks one batch of questions.
+3. **Read the docs it writes** and fix anything wrong; what you write there is binding. Set `risk` and `approve` in `AGENTS.md` if the defaults don't fit.
+
+### Daily use
+
+1. **Start a new session for each request.** The docs carry the context, so a fresh session loses nothing, and it's cheaper and sharper than one that has run for days.
+2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc, plus a GitHub feature issue with the slices as its sub-issues. The doc reaches `main` on its own PR, which the agent merges without waiting for `merge`, so a session started from any of the issues can read it.
+3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
+
+Every issue the bundle creates starts with the command that builds it, so you can start work from Orca's issue list. Filter it with `is:open label:feature` for the features, `is:open label:ready-for-agent -label:slice` for everything you can start at the top level (features and tickets), or `label:feature:NNNN` for one feature and its slices. Orca doesn't show sub-issues or filter on them, so each slice also links to its feature issue.
+
+To build an existing plan:
+- **In one session:** start the feature issue from Orca, or run `/drive-feature <feature issue URL or docs/features/NNNN-*.md>`. It builds the slices the plan marks as buildable together in parallel, and the rest in dependency order, closes each slice's issue as it merges, and the final PR closes the feature issue. To check as you go, or to build fewer at once, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
+  ```
+  /drive-feature docs/features/0003-csv-export.md build 3 slices, then stop
+  /drive-feature docs/features/0003-csv-export.md at most 2 at once
+  /drive-feature docs/features/0003-csv-export.md one slice at a time, I'll test each on my phone
+  /drive-feature docs/features/0003-csv-export.md build only slice 2
+  ```
+- **One slice or ticket per session** (for example, several sessions side by side): start its issue from Orca, or run `/build-slice <issue URL>`. With no feature branch, each gets its own PR into `main` that closes its issue, merged on your `go`. Pick slices the feature doc marks as buildable together. When the last slice of a feature merges, its stop tells you to start the feature issue from Orca: it skips the finished slices, does only the finish (docs, `living-docs`, status), and its PR closes the feature issue. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
+
+## Skills
+
+| Skill | Does |
+|---|---|
+| `living-docs` | Creates or refreshes `AGENTS.md` and `docs/{BUSINESS,PRODUCT,ARCHITECTURE,DESIGN}.md` (BUSINESS and DESIGN are optional) |
+| `adr` | Records a decision in `docs/adr/NNNN-*.md` |
+| `plan-feature` | Triage, then `docs/features/NNNN-*.md` plus a feature issue with its slices as sub-issues |
+| `build-slice` | Builds one slice to done: tests, end-to-end check, review, PR, green CI, docs updated |
+| `drive-feature` | Runs `build-slice` across a feature's slices, then reports once |
+
+Each skill works on its own; they coordinate only through the files above and their GitHub issues.
+Execution uses omp's built-in features (`task`, the `reviewer` agent, `browser`, the `github` tool), plus `gh` for issues, which the `github` tool can't create. If one is missing, the skill uses an equivalent, or stops and says so.
+
 ## Models
 
 There are three jobs, and they need different things:
@@ -129,72 +169,6 @@ Tested in [`runs/`](runs/) (✓ good, ✗ not good enough, ? untested, – not w
 | `qwen/qwen3.8-max-0902` | $2 / $6 | ? | ? | ? |
 
 Proven so far: **Opus plans, GLM 5.3 builds, GPT-6.1 Sol or Kimi K3 reviews**, for about $6 for a small MVP. On a real 5-day project with Opus building, building was 70% of the cost. Cheap models plan badly: they fill business gaps with silent defaults and state unchecked facts. Kimi K2.7 Code couldn't drive the bundle at all ([run 4](runs/2026-10-14-receipt-scanner-cheap-models.md)). The smallest tiers (Haiku, GPT Luna, the Flash models) are untested and probably too small to build.
-
-## Install
-
-```sh
-npx skills add saankofi/sprengikraftur -g -a pi
-```
-
-`pi` is omp's upstream, so this installs into `~/.agents/skills`, which omp reads. Leave out `-g` to install into one project's `.agents/skills` instead. Check with `omp read skill://plan-feature`; update with `npx skills update -g`.
-
-## Usage
-
-### Setup (once per project)
-
-1. **Install** the skills and **set the model roles** (above).
-2. In omp, in the project's directory, run `/living-docs`, adding what you know: what it's for, who uses it, the stack. It reads any existing code and asks one batch of questions.
-3. **Read the docs it writes** and fix anything wrong; what you write there is binding. Set `risk` and `approve` in `AGENTS.md` if the defaults don't fit.
-
-### Daily use
-
-1. **Start a new session for each request.** The docs carry the context, so a fresh session loses nothing, and it's cheaper and sharper than one that has run for days.
-2. **Ask for what you want**, from one line to a full spec. `plan-feature` usually loads by itself; if not, run `/plan-feature <request>`. Small things are done directly; bigger ones get a feature doc, plus a GitHub feature issue with the slices as its sub-issues. The doc reaches `main` on its own PR, which the agent merges without waiting for `merge`, so a session started from any of the issues can read it.
-3. **Do what each stop says.** Answer its questions (`go` accepts the defaults), check the plan if `plan` is in `approve`, and approve the PR into `main` with `go`. The agent merges it, and the docs are already current. When a request is finished, start a new session for the next one.
-
-Every issue the bundle creates starts with the command that builds it, so you can start work from Orca's issue list. Filter it with `is:open label:feature` for the features, `is:open label:ready-for-agent -label:slice` for everything you can start at the top level (features and tickets), or `label:feature:NNNN` for one feature and its slices. Orca doesn't show sub-issues or filter on them, so each slice also links to its feature issue.
-
-To build an existing plan:
-- **In one session:** start the feature issue from Orca, or run `/drive-feature <feature issue URL or docs/features/NNNN-*.md>`. It builds the slices the plan marks as buildable together in parallel, and the rest in dependency order, closes each slice's issue as it merges, and the final PR closes the feature issue. To check as you go, or to build fewer at once, add a limit in plain words. It stops after each batch on the feature branch, and `go` starts the next. For example:
-  ```
-  /drive-feature docs/features/0003-csv-export.md build 3 slices, then stop
-  /drive-feature docs/features/0003-csv-export.md at most 2 at once
-  /drive-feature docs/features/0003-csv-export.md one slice at a time, I'll test each on my phone
-  /drive-feature docs/features/0003-csv-export.md build only slice 2
-  ```
-- **One slice or ticket per session** (for example, several sessions side by side): start its issue from Orca, or run `/build-slice <issue URL>`. With no feature branch, each gets its own PR into `main` that closes its issue, merged on your `go`. Pick slices the feature doc marks as buildable together. When the last slice of a feature merges, its stop tells you to start the feature issue from Orca: it skips the finished slices, does only the finish (docs, `living-docs`, status), and its PR closes the feature issue. After a big change made outside the bundle, run `/living-docs` to bring the docs back in line.
-
-## Many features at once
-
-The bundle is built for an agent development environment (ADE) such as Orca: a window with the repo's issue list, where each issue starts a session in its own worktree. Every issue the bundle creates begins with the command that builds it, so starting one from the list is the whole handoff.
-
-```mermaid
-flowchart LR
-    Y["You"] --> O["Orca: the repo's issue list"]
-    O --> F1["session: feature 12<br>drive-feature"]
-    O --> F2["session: feature 13<br>drive-feature"]
-    O --> T["session: ticket 14<br>build-slice"]
-    F1 --> A1["slice"] & A2["slice"] & A3["slice"]
-    F2 --> B1["slice"] & B2["slice"]
-    A1 & A2 & A3 --> M1["PR into main"]
-    B1 & B2 --> M2["PR into main"]
-    T --> M3["PR into main"]
-    M1 & M2 & M3 -->|"you: go"| M["main"]
-```
-
-One session per feature or ticket, one subagent per slice, each in its own worktree. Your job is the plan stops and the `go` on each PR into `main`; the docs on `main` carry the context, so sessions don't need each other. Without an ADE, the same thing is several omp sessions side by side, started by hand with the issue URLs.
-
-## Status
-
-Tested on six runs: a receipt-scanner MVP and two features on top of it with Opus and GPT, then the MVP again with cheap models and with Opus planning and GLM building, and finally a first real project. Not yet checked:
-1. Using the `github` tool's Actions watch for the CI fix loop.
-2. Whether goal or loop mode helps `drive-feature`.
-3. `approve: [slice]`.
-4. Starting issues from Orca's issue list.
-5. Putting the feature doc on `main` through its own PR.
-6. Picking a feature back up in a new session, on its existing feature branch.
-
-Write-ups of test runs are in [`runs/`](runs/).
 
 Ideas borrowed from OpenSpec, BMAD, Matt Pocock's skills, Compound Engineering, Spec Kit, Superpowers and cc-sdd.
 
