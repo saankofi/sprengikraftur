@@ -2,6 +2,8 @@
 
 A small skill bundle for building software with strong LLM agents on [oh-my-pi (omp)](https://github.com/can1357/oh-my-pi).
 
+Made by [Saankofi](https://saankofi.com) and [PO2 Academy](https://www.po2academy.com).
+
 ```mermaid
 flowchart TB
     Y["You: requests"] --> P["plan-feature, one session per request<br>one batch of questions, feature doc, issues"]
